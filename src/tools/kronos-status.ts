@@ -6,7 +6,7 @@ export function registerKronosStatusTool(server: McpServer) {
     "kronos_status",
     {
       description:
-        "Consulta el estado real de producción de KRONOS.",
+        "Consulta el estado real de producción de KRONOS: API, base de datos, realtime y build.",
       inputSchema: {},
     },
     async () => {
@@ -17,7 +17,19 @@ export function registerKronosStatusTool(server: McpServer) {
           content: [
             {
               type: "text",
-              text: JSON.stringify(health, null, 2),
+              text: JSON.stringify(
+                {
+                  ok: health.ok,
+                  service: health.service,
+                  database: health.database,
+                  realtime: health.realtime,
+                  environment: health.environment,
+                  build: health.build,
+                  timestamp: health.timestamp,
+                },
+                null,
+                2
+              ),
             },
           ],
         };
