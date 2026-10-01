@@ -6,7 +6,7 @@ export function registerKronosMeTool(server: McpServer) {
     "kronos_me",
     {
       description:
-        "Consulta la identidad y permisos del servicio MCP autenticado en KRONOS.",
+        "Consulta la identidad y permisos de la credencial MCP autenticada en KRONOS.",
       inputSchema: {},
     },
     async () => {
