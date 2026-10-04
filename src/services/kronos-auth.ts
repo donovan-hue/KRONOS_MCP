@@ -1,26 +1,23 @@
-import { env } from "../config/env.js";
+import { z } from "zod";
 import { getKronosMcpToken } from "../config/mcp.js";
+import { KronosApiError, requestKronosJson, type RequestOptions } from "./kronos-api.js";
 
-export async function getKronosMe() {
-  const response = await fetch(
-    `${env.KRONOS_API_URL}/api/mcp/me`,
-    {
-      headers: {
-        Authorization: `Bearer ${getKronosMcpToken()}`,
-        Accept: "application/json",
-      },
-    }
-  );
+const identitySchema = z.object({
+  ok: z.boolean(),
+  service: z.string(),
+  identity: z.string(),
+  permissions: z.array(z.string()),
+}).passthrough();
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      `KRONOS API respondió HTTP ${response.status}: ${
-        data?.error || "Error de autenticación MCP"
-      }`
-    );
+export async function getKronosMe(options: RequestOptions = {}) {
+  let token: string;
+  try {
+    token = options.token ?? getKronosMcpToken();
+  } catch {
+    throw new KronosApiError("AUTH_REQUIRED");
   }
-
-  return data;
+  const data = await requestKronosJson("/api/mcp/me", token, options);
+  const parsed = identitySchema.safeParse(data);
+  if (!parsed.success) throw new KronosApiError("INVALID_RESPONSE");
+  return parsed.data;
 }
