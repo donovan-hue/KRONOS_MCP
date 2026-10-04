@@ -1,23 +1,16 @@
 import { readFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import dotenv from 'dotenv';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { ROOT, VerificationError, requireCondition, loadVerificationConfig } from './verification-config.mjs';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TIMEOUT = { timeout: 15_000 };
 const TOOL_NAMES = ['kronos_status', 'kronos_health', 'kronos_me'];
 const SAFE_CODES = new Set([
   'AUTH_REQUIRED', 'CONFIG_INVALID', 'UPSTREAM_TIMEOUT', 'UPSTREAM_UNAVAILABLE',
   'UPSTREAM_HTTP_ERROR', 'INVALID_RESPONSE', 'RESPONSE_TOO_LARGE', 'INTERNAL_ERROR',
 ]);
-
-class VerificationError extends Error {}
-
-function requireCondition(condition, code) {
-  if (!condition) throw new VerificationError(code);
-}
 
 function toolFailure(result) {
   // Upstream text/JSON is untrusted. Never print it, even on errors.
@@ -111,30 +104,9 @@ export async function verifyMcp(transport, report = console.log) {
   return !failed;
 }
 
-function parseArgs(args) {
-  // No token flag: credentials must never appear in the command line/history.
-  requireCondition(args[0] === '--live', 'LIVE_OPT_IN_REQUIRED');
-  requireCondition(args.length === 1 || (args.length === 3 && args[1] === '--env-file' && args[2]), 'INVALID_ARGUMENTS');
-  return { envFile: resolve(args[2] ?? resolve(ROOT, '.env')), explicitFile: args.length === 3 };
-}
-
 export async function main(args = process.argv.slice(2)) {
   try {
-    const { envFile, explicitFile } = parseArgs(args);
-    let fileEnv = {};
-    try {
-      fileEnv = dotenv.parse(await readFile(envFile));
-    } catch (error) {
-      if (explicitFile || error?.code !== 'ENOENT') throw new VerificationError('ENV_FILE_UNREADABLE');
-    }
-    // Match the server's non-overriding dotenv precedence. Forward only what is needed.
-    const token = (process.env.KRONOS_MCP_TOKEN ?? fileEnv.KRONOS_MCP_TOKEN ?? '').trim();
-    requireCondition(token.length > 0, 'AUTH_REQUIRED');
-    requireCondition(!/[\r\n\x00-\x1f\x7f]/.test(token), 'CONFIG_INVALID');
-    const apiUrl = (process.env.KRONOS_API_URL ?? fileEnv.KRONOS_API_URL ?? 'https://api.kronos-space.com').trim();
-    let parsed;
-    try { parsed = new URL(apiUrl); } catch { throw new VerificationError('CONFIG_INVALID'); }
-    requireCondition(parsed.protocol === 'https:' && !parsed.username && !parsed.password && !parsed.search && !parsed.hash, 'CONFIG_INVALID');
+    const { envFile, token, apiUrl } = await loadVerificationConfig(args);
     try { await readFile(resolve(ROOT, 'dist/index.js')); } catch { throw new VerificationError('BUILD_REQUIRED'); }
 
     const transport = new StdioClientTransport({

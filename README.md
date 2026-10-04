@@ -64,11 +64,24 @@ Si el archivo privado está en otra ubicación, se puede leer sin copiarlo:
 npm run verify:mcp -- --live --env-file "/ruta/privada/al/archivo.env"
 ```
 
-Sustituye únicamente la ruta. Nunca pases el valor del token por argumento. Las variables ya inyectadas en el proceso tienen prioridad sobre el archivo, incluido un valor vacío. El comando sin `--live` falla antes de cargar secretos o conectar. `npm test` no carga archivos privados, y bloquea la red real en sus pruebas.
+Sustituye únicamente la ruta. Nunca pases el valor del token por argumento. Las variables ya inyectadas en el proceso tienen prioridad sobre el archivo, incluido un valor vacío. El comando sin `--live` falla antes de cargar secretos o conectar. `npm test` no carga archivos privados, y no llama a APIs externas en sus pruebas (las pruebas de timeout usan HTTP loopback sintético).
 
 El verificador usa el cliente SDK, descubre herramientas, comprueba rechazo de entrada inválida y herramienta desconocida, y llama `kronos_me`, `kronos_status` y `kronos_health`. Una ejecución completa realiza un GET autenticado a `/api/mcp/me` y dos GET públicos a `/api/health`. El backend puede actualizar `lastUsedAt`; no se rota ni revoca nada. La salida contiene solo etapas PASS/FAIL y códigos de error permitidos, nunca valores de identidad, permisos, tokens o cuerpos completos.
 
 El antiguo `tests/mcp-test.ts` ahora delega a este verificador y también exige `--live`; ya no anuncia éxito si la herramienta falla.
+
+## Si `kronos_me` termina en timeout
+
+Consulta [la revisión del flujo y diagnóstico seguro](docs/DIAGNOSTICO_TIMEOUT_ME.md). El endpoint sigue siendo `/api/mcp/me`, con 10 s de plazo total HTTP (cabeceras y cuerpo) y 15 s por petición del verificador MCP. No se ha ampliado el plazo ni cambiado a `/status`.
+
+Después de actualizar y ejecutar `npm test`:
+
+```sh
+npm run diagnose:kronos -- --live
+# O añadir: --env-file "/ruta/real/al/archivo.env"
+```
+
+Realiza dos GET autenticados, `/me` y `/status`, con la misma configuración y sin rotar nada. Informa destino sanitizado, origen de configuración, fase, status y duración, no secretos ni cuerpos. Las dos llamadas pueden actualizar `lastUsedAt`. Su objetivo es diagnosticar desde el entorno que falla, no certificar producción desde pruebas locales.
 
 ## Variables
 

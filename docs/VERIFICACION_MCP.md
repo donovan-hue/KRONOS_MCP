@@ -4,7 +4,8 @@
 
 - **Reportado por el propietario desde Termux:** petición autenticada a KRONOS con HTTP 200, `authenticated: true`, identidad `kronos-mcp`, permisos `status`, `health`, `me`. Token no compartido ni versionado.
 - **Ejecutado en este checkout:** build y 22 pruebas locales pasando (22 casos, incluyendo subtests). Hay procesos reales por stdio, pero todas sus respuestas HTTP se simulan; no se envían peticiones a KRONOS.
-- **Pendiente:** ejecución del verificador por stdio contra la API real desde el celular. No debe presentarse como completada hasta recibir ese resultado.
+- **Reportado después por el propietario:** copia actualizada y 22/22 pruebas locales pasando; verificación real supera handshake, catálogo, input y tool inexistente, pero falla en `kronos_me` con `UPSTREAM_TIMEOUT`. No hay éxito E2E todavía.
+- **En revisión:** [diagnóstico de timeout](DIAGNOSTICO_TIMEOUT_ME.md); 34 pruebas locales pasando con instrumentación y corrección de clasificación del cuerpo. Pendiente diagnóstico desde Termux.
 
 La credencial válida **no debe rotarse, revocarse ni modificarse** como parte de esta verificación.
 

@@ -242,3 +242,7 @@ No se leyeron ni divulgaron valores secretos. El build generado y las dependenci
 - [Rutas MCP](https://github.com/donovan-hue/Kronos-space.com/blob/ee49ebe61ebf34915e5bdc4c010d80b20d20abaf/server/src/modules/mcp/mcp.routes.js)
 - [Health del backend](https://github.com/donovan-hue/Kronos-space.com/blob/ee49ebe61ebf34915e5bdc4c010d80b20d20abaf/server/src/server.js)
 - [Datos de build y nulabilidad](https://github.com/donovan-hue/Kronos-space.com/blob/ee49ebe61ebf34915e5bdc4c010d80b20d20abaf/server/src/config/buildInfo.js)
+
+## Seguimiento: timeout reportado en Termux
+
+El propietario ejecutó la copia actualizada: pruebas locales 22/22 y verificador real hasta `kronos_me`, donde reportó `UPSTREAM_TIMEOUT`. No debe marcarse el recorrido completo como exitoso. La revisión del endpoint, precedencia de URL, timeout y manejo del cuerpo está en [DIAGNOSTICO_TIMEOUT_ME.md](DIAGNOSTICO_TIMEOUT_ME.md). No se modificaron credenciales, main ni backend.
