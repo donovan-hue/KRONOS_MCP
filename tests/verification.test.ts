@@ -54,7 +54,17 @@ for (const [scenario, expectedFailure] of [
       const output = [...lines, stderr].join('\n');
       assert.ok(!output.includes('offline-private-detail'));
       assert.ok(!output.includes('offline-token-not-a-credential'));
-      assert.equal(stderr, '');
+
+      // stderr may carry structured observability, but nothing else: every line
+      // must be a well-formed log event, and no line may carry a secret.
+      for (const line of stderr.split('\n')) {
+        if (!line.trim()) continue;
+        const parsed = JSON.parse(line);
+        assert.ok(typeof parsed.level === 'string', 'log line needs a level');
+        assert.ok(typeof parsed.event === 'string', 'log line needs an event');
+      }
+      assert.ok(!stderr.includes('offline-private-detail'));
+      assert.ok(!stderr.includes('offline-token-not-a-credential'));
       assert.equal(transport.pid, null, 'child must be closed after success or failure');
     } finally {
       await rm(cwd, { recursive: true, force: true });

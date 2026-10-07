@@ -90,10 +90,21 @@ npm run diagnose:kronos -- --live
 
 Realiza dos GET autenticados, `/me` y `/status`, con la misma configuración y sin rotar nada. Informa destino sanitizado, origen de configuración, fase, status y duración, no secretos ni cuerpos. Las dos llamadas pueden actualizar `lastUsedAt`. Su objetivo es diagnosticar desde el entorno que falla, no certificar producción desde pruebas locales.
 
+## Observabilidad
+
+Los eventos se emiten como una línea JSON por evento, **solo en `stderr`**: `stdout` pertenece al protocolo MCP y un solo byte allí corrompe el stream.
+
+Solo se registran primitivas (string, número, booleano, `null`). Cualquier objeto, arreglo o función se sustituye por `[omitted]`, de modo que un token o un cuerpo de respuesta del proveedor **no pueden** filtrarse por olvido.
+
+```sh
+KRONOS_LOG_LEVEL=debug npm start   # debug | info (por defecto) | warn | error
+```
+
 ## Variables
 
 - `NODE_ENV`: etiqueta de entorno opcional.
 - `KRONOS_API_URL`: URL base HTTPS opcional.
 - `KRONOS_MCP_TOKEN`: credencial privada requerida únicamente para `kronos_me`.
+- `KRONOS_LOG_LEVEL`: nivel mínimo de log opcional; por defecto `info`.
 
 **Nunca guardes tokens en Git, logs o salidas de herramientas.** Emite y rota credenciales por los mecanismos autorizados del backend. No se ha documentado aquí un procedimiento de emisión automática.
