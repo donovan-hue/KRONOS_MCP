@@ -8,8 +8,9 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 const TIMEOUT = { timeout: 15_000 };
 const TOOL_NAMES = ['kronos_status', 'kronos_health', 'kronos_me'];
 const SAFE_CODES = new Set([
-  'AUTH_REQUIRED', 'CONFIG_INVALID', 'UPSTREAM_TIMEOUT', 'UPSTREAM_UNAVAILABLE',
-  'UPSTREAM_HTTP_ERROR', 'INVALID_RESPONSE', 'RESPONSE_TOO_LARGE', 'INTERNAL_ERROR',
+  'AUTH_REQUIRED', 'FORBIDDEN', 'CONFIG_INVALID', 'UPSTREAM_TIMEOUT',
+  'UPSTREAM_UNAVAILABLE', 'UPSTREAM_HTTP_ERROR', 'INVALID_RESPONSE',
+  'RESPONSE_TOO_LARGE', 'INTERNAL_ERROR',
 ]);
 
 function toolFailure(result) {

@@ -3,8 +3,9 @@ import { pathToFileURL } from 'node:url';
 import { ROOT, VerificationError, loadVerificationConfig } from './verification-config.mjs';
 
 const SAFE_CODES = new Set([
-  'AUTH_REQUIRED', 'CONFIG_INVALID', 'UPSTREAM_TIMEOUT', 'UPSTREAM_UNAVAILABLE',
-  'UPSTREAM_HTTP_ERROR', 'INVALID_RESPONSE', 'RESPONSE_TOO_LARGE', 'INTERNAL_ERROR',
+  'AUTH_REQUIRED', 'FORBIDDEN', 'CONFIG_INVALID', 'UPSTREAM_TIMEOUT',
+  'UPSTREAM_UNAVAILABLE', 'UPSTREAM_HTTP_ERROR', 'INVALID_RESPONSE',
+  'RESPONSE_TOO_LARGE', 'INTERNAL_ERROR',
 ]);
 const elapsed = start => Math.max(0, Math.round(performance.now() - start));
 
