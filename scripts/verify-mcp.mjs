@@ -6,7 +6,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 const TIMEOUT = { timeout: 15_000 };
-const TOOL_NAMES = ['kronos_status', 'kronos_health', 'kronos_me'];
+const TOOL_NAMES = ['kronos_status', 'kronos_health', 'kronos_me', 'kronos_contracts'];
 const SAFE_CODES = new Set([
   'AUTH_REQUIRED', 'FORBIDDEN', 'CONFIG_INVALID', 'UPSTREAM_TIMEOUT',
   'UPSTREAM_UNAVAILABLE', 'UPSTREAM_HTTP_ERROR', 'INVALID_RESPONSE',

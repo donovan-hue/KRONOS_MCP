@@ -1,7 +1,14 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { readOnlyTool, toolAnnotations } from "../contracts/tool.js";
 import { getKronosHealth } from "../services/kronos-api.js";
 import { toolError } from "./tool-error.js";
+
+export const kronosStatusContract = readOnlyTool({
+  name: "kronos_status",
+  description: "Consulta el estado real de KRONOS mediante /api/health (endpoint de salud público; no valida la credencial MCP).",
+  capability: "diagnostics",
+});
 
 const healthOutput = z.object({
   ok: z.boolean(), service: z.string(), database: z.string(), realtime: z.boolean(),

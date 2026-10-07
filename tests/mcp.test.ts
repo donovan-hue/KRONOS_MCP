@@ -110,7 +110,12 @@ test("MCP advertises existing tools, structured output, and rejects extra input"
   t.after(async () => { await client.close(); await server.close(); });
 
   const { tools } = await client.listTools();
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["kronos_health", "kronos_me", "kronos_status"]);
+  assert.deepEqual(tools.map((tool) => tool.name).sort(), [
+    "kronos_contracts",
+    "kronos_health",
+    "kronos_me",
+    "kronos_status",
+  ]);
   assert.ok(tools.every((tool) => tool.outputSchema));
   assert.ok(tools.every((tool) => tool.annotations?.readOnlyHint === true));
   const badInput = await client.callTool({ name: "kronos_status", arguments: { unexpected: true } });
@@ -119,4 +124,42 @@ test("MCP advertises existing tools, structured output, and rejects extra input"
   const missingToken = await client.callTool({ name: "kronos_me", arguments: {} });
   assert.equal(missingToken.isError, true);
   assert.match(JSON.stringify(missingToken), /AUTH_REQUIRED/);
+});
+
+test("kronos_contracts reports registered tools without network or credential", async (t) => {
+  const server = createKronosServer();
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+  const client = new Client({ name: "unit-test", version: "1.0.0" });
+  await server.connect(serverTransport);
+  await client.connect(clientTransport);
+  t.after(async () => { await client.close(); await server.close(); });
+
+  const result = await client.callTool({ name: "kronos_contracts", arguments: {} });
+  assert.notEqual(result.isError, true);
+
+  const payload = result.structuredContent as {
+    service: string;
+    capabilities: string[];
+    tools: { name: string; capability: string; readOnly: boolean; requiredPermission?: string }[];
+    resources: string[];
+    prompts: string[];
+  };
+
+  assert.equal(payload.service, "kronos-mcp");
+  assert.deepEqual(payload.capabilities, ["diagnostics"]);
+  assert.deepEqual(payload.tools.map((tool) => tool.name).sort(), [
+    "kronos_contracts",
+    "kronos_health",
+    "kronos_me",
+    "kronos_status",
+  ]);
+  assert.ok(payload.tools.every((tool) => tool.readOnly === true));
+  assert.ok(payload.tools.every((tool) => tool.requiredPermission === undefined));
+
+  // Nothing is served yet, so nothing may be advertised.
+  assert.deepEqual(payload.resources, []);
+  assert.deepEqual(payload.prompts, []);
+
+  const extraInput = await client.callTool({ name: "kronos_contracts", arguments: { x: 1 } });
+  assert.equal(extraInput.isError, true);
 });

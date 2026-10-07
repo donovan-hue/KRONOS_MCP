@@ -30,12 +30,19 @@ El transporte stdio reserva stdout para mensajes MCP. No añadas `console.log` e
 | `kronos_status` | Lectura compacta del `GET /api/health` público | No valida credencial MCP | Salida MCP estructurada; no acredita autenticación |
 | `kronos_health` | Lectura del `GET /api/health` público | No valida credencial MCP | Salida MCP estructurada; un HTTP no exitoso es error de herramienta |
 | `kronos_me` | Consulta identidad y permisos por `GET /api/mcp/me` | `KRONOS_MCP_TOKEN` de servicio | Salida MCP estructurada; requiere credencial configurada y aceptada por KRONOS |
+| `kronos_contracts` | Describe las herramientas, capacidades y contratos declarados por este servidor | Ninguna, no contacta KRONOS | Salida MCP estructurada; `resources` y `prompts` salen vacíos porque aún no se sirve ninguno |
 
-Las tres herramientas son de solo lectura. `kronos_me` informa permisos devueltos por el backend; este cliente no afirma que KRONOS haga cumplir scopes por herramienta. No hay aquí herramientas de búsqueda, perfil, analytics, KAIROS, escritura, publicación ni borrado.
+Las cuatro herramientas son de solo lectura. `kronos_me` informa permisos devueltos por el backend; este cliente no afirma que KRONOS haga cumplir scopes por herramienta. No hay aquí herramientas de búsqueda, perfil, analytics, KAIROS, escritura, publicación ni borrado.
+
+## Contratos
+
+`src/contracts` define el vocabulario compartido (capacidades, herramientas, recursos, prompts, permisos, jobs, proyectos, credenciales y skills). `src/auth/permissions` compara el conjunto de permisos que devuelve `/api/mcp/me` contra lo que declara cada herramienta. **La comprobación está implementada y probada, pero no cableada**: los permisos que concede un despliegue real no se conocen desde este repositorio, así que activarla ahora podría bloquear una identidad que funciona.
+
+Faltan deliberadamente los contratos de `Provider`, `ProviderAdapter`, `Model`, `Cost` y `Credits`: pertenecen al trabajo de IA generativa y créditos, actualmente en pausa.
 
 ## Errores y límites
 
-Los errores MCP usan códigos estables y no incluyen el cuerpo arbitrario de KRONOS: `AUTH_REQUIRED`, `CONFIG_INVALID`, `UPSTREAM_TIMEOUT`, `UPSTREAM_UNAVAILABLE`, `UPSTREAM_HTTP_ERROR`, `INVALID_RESPONSE`, `RESPONSE_TOO_LARGE` o `INTERNAL_ERROR`. Cuando existe estado HTTP, se entrega separadamente. Timeout por petición: 10 segundos. Cuerpo máximo: 1 MiB. Redirects rechazados. No se hacen reintentos automáticos.
+Los errores MCP usan códigos estables y no incluyen el cuerpo arbitrario de KRONOS: `AUTH_REQUIRED`, `FORBIDDEN`, `CONFIG_INVALID`, `UPSTREAM_TIMEOUT`, `UPSTREAM_UNAVAILABLE`, `UPSTREAM_HTTP_ERROR`, `INVALID_RESPONSE`, `RESPONSE_TOO_LARGE` o `INTERNAL_ERROR`. Cuando existe estado HTTP, se entrega separadamente. Timeout por petición: 10 segundos. Cuerpo máximo: 1 MiB. Redirects rechazados. No se hacen reintentos automáticos.
 
 ## Pruebas y build
 

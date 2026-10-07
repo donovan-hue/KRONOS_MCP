@@ -1,7 +1,14 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { readOnlyTool, toolAnnotations } from "../contracts/tool.js";
 import { getKronosHealth } from "../services/kronos-api.js";
 import { toolError } from "./tool-error.js";
+
+export const kronosHealthContract = readOnlyTool({
+  name: "kronos_health",
+  description: "Devuelve el diagnóstico del endpoint público /api/health. Si KRONOS devuelve HTTP no exitoso, la herramienta informa un error estructurado.",
+  capability: "diagnostics",
+});
 
 const nullableString = z.string().nullable().optional();
 const healthOutput = z.object({
