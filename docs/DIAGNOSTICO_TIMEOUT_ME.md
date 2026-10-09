@@ -117,4 +117,4 @@ Un arranque lento, latencia de red, DNS/TLS/IPv6, proxy o espera del backend son
 - Precedencia compartida de configuración y redacción de salida.
 - CLI que rechaza ejecutar sin `--live`.
 
-**Pendiente:** resultados del diagnóstico en Termux y, después, nueva verificación completa. Ninguna prueba local acredita que el timeout en producción ya esté resuelto.
+**Validación posterior en Termux:** el diagnóstico real pasó para `/api/mcp/me` y `/api/mcp/status` (HTTP 200, contrato válido); después, `verify:mcp -- --live` pasó handshake, catálogo, rechazos de entradas/herramientas y las herramientas `kronos_me`, `kronos_status` y `kronos_health`. Esto demuestra que la ruta completa funcionó en esa ejecución; no garantiza que no vuelvan a ocurrir timeouts ni identifica retrospectivamente la causa exacta del fallo anterior.
