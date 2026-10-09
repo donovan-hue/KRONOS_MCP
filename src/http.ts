@@ -1,8 +1,9 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import dotenv from "dotenv";
 import { createKronosServer } from "./server.js";
+import { hasValidBearerToken } from "./http-auth.js";
 
 dotenv.config({
   path: process.env.DOTENV_CONFIG_PATH || ".env",
@@ -23,14 +24,6 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 }
 
 const host = process.env.MSP_HTTP_HOST || "0.0.0.0";
-const expectedAuthorization = Buffer.from(`Bearer ${configuredToken}`);
-
-function hasValidBearerToken(authorization: string | undefined): boolean {
-  if (!authorization) return false;
-  const provided = Buffer.from(authorization);
-  return provided.length === expectedAuthorization.length &&
-    timingSafeEqual(provided, expectedAuthorization);
-}
 
 function sendJson(res: ServerResponse, status: number, payload: Record<string, string>): void {
   res.writeHead(status, {
@@ -60,7 +53,7 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
     return;
   }
 
-  if (!hasValidBearerToken(req.headers.authorization)) {
+  if (!hasValidBearerToken(req.headers.authorization, configuredToken)) {
     res.setHeader("www-authenticate", "Bearer");
     sendJson(res, 401, { error: "AUTH_REQUIRED" });
     return;
