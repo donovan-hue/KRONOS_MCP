@@ -67,16 +67,16 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
 });
 
 httpServer.on("error", (error: NodeJS.ErrnoException) => {
-  process.stderr.write(`[kronos-msp-http] server error: ${error.code || "UNKNOWN"}\\n`);
+  process.stderr.write(`[kronos-msp-http] server error: ${error.code || "UNKNOWN"}\n`);
   process.exitCode = 1;
 });
 
 httpServer.listen(port, host, () => {
-  process.stderr.write(`[kronos-msp-http] listening on ${host}:${port}\\n`);
+  process.stderr.write(`[kronos-msp-http] listening on ${host}:${port}\n`);
 });
 
 async function shutdown(signal: string): Promise<void> {
-  process.stderr.write(`[kronos-msp-http] received ${signal}; shutting down\\n`);
+  process.stderr.write(`[kronos-msp-http] received ${signal}; shutting down\n`);
   httpServer.close(() => {
     void transport.close().finally(() => {
       process.exit(0);
