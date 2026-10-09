@@ -1,7 +1,7 @@
 {
   "name": "kronos-mcp",
   "version": "0.2.0",
-  "description": "MCP stdio client for KRONOS capabilities",
+  "description": "MCP stdio server for KRONOS capabilities",
   "main": "dist/index.js",
   "scripts": {
     "test": "npm run build && node --import tsx --test tests/*.test.ts",

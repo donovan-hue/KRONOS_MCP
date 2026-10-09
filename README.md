@@ -75,7 +75,7 @@ Sustituye únicamente la ruta. Nunca pases el valor del token por argumento. Las
 
 El verificador usa el cliente SDK, descubre herramientas, comprueba rechazo de entrada inválida y herramienta desconocida, y llama `kronos_me`, `kronos_status` y `kronos_health`. Una ejecución completa realiza un GET autenticado a `/api/mcp/me` y dos GET públicos a `/api/health`. El backend puede actualizar `lastUsedAt`; no se rota ni revoca nada. La salida contiene solo etapas PASS/FAIL y códigos de error permitidos, nunca valores de identidad, permisos, tokens o cuerpos completos.
 
-El antiguo `tests/mcp-test.ts` ahora delega a este verificador y también exige `--live`; ya no anuncia éxito si la herramienta falla.
+El antiguo `tests/mcp-test.ts` fue retirado. La verificación actual está en `scripts/verify-mcp.mjs` y se ejecuta mediante `npm run verify:mcp -- --live`.
 
 ## Si `kronos_me` termina en timeout
 
