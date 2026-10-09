@@ -23,7 +23,7 @@ const healthOutput = z.object({
 
 export function registerKronosHealthTool(server: McpServer) {
   server.registerTool("kronos_health", {
-    description: "Devuelve el diagnóstico del endpoint público /api/health. Si KRONOS devuelve HTTP no exitoso, la herramienta informa un error estructurado.",
+    description: "Devuelve el diagnóstico de /api/health. La herramienta MCP requiere el permiso health, aunque el endpoint upstream sea público. Si KRONOS devuelve HTTP no exitoso, informa un error estructurado.",
     inputSchema: z.object({}).strict(), outputSchema: healthOutput,
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
   }, withToolAuthorization(kronosHealthContract, async () => {
