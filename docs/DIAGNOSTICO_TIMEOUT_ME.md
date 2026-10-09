@@ -82,7 +82,7 @@ npm run diagnose:kronos -- --live --env-file "/ruta/real/al/archivo.env"
 
 **Requiere actualizar esta rama y ejecutar `npm test` antes**, para compilar el cliente revisado. No copiar plantillas encima del archivo privado.
 
-El comando usa el mismo cargador de configuración que `verify:mcp`, las mismas funciones de servicio del build y el mismo timeout. Ejecuta **dos GET autenticados**, primero `/api/mcp/me` y luego `/api/mcp/status`, incluso si el primero falla. No modifica el token ni MongoDB; el backend puede actualizar `lastUsedAt` dos veces. No incluye el gasto de arrancar MCP: sirve para aislar su cliente HTTP.
+El comando usa el mismo cargador de configuración que `verify:mcp`, las mismas funciones de servicio del build y el mismo timeout. Ejecuta **dos GET autenticados**, primero `/api/mcp/me` y luego `/api/mcp/status`, incluso si el primero falla. No modifica el token ni escribe directamente en MongoDB. Sin embargo, cada petición autenticada puede hacer que el backend actualice `lastUsedAt`; como ejecuta dos GET, ese campo puede actualizarse hasta dos veces. No incluye el gasto de arrancar MCP: sirve para aislar su cliente HTTP.
 
 Salida:
 
