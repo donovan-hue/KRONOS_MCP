@@ -25,7 +25,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 const host = process.env.MSP_HTTP_HOST || "0.0.0.0";
 const expectedAuthorization = Buffer.from(`Bearer ${configuredToken}`);
 
-export function hasValidBearerToken(authorization: string | undefined): boolean {
+function hasValidBearerToken(authorization: string | undefined): boolean {
   if (!authorization) return false;
   const provided = Buffer.from(authorization);
   return provided.length === expectedAuthorization.length &&
