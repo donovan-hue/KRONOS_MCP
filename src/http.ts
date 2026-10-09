@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import dotenv from "dotenv";
@@ -35,9 +34,9 @@ function sendJson(res: ServerResponse, status: number, payload: Record<string, s
 }
 
 const mcpServer = createKronosServer();
-const transport = new StreamableHTTPServerTransport({
-  sessionIdGenerator: () => randomUUID(),
-});
+// Stateless mode avoids binding one long-lived transport to a single client session.
+// Each authenticated request uses the same registered tool server without session state.
+const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 await mcpServer.connect(transport);
 
 const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
@@ -68,16 +67,16 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
 });
 
 httpServer.on("error", (error: NodeJS.ErrnoException) => {
-  process.stderr.write(`[kronos-msp-http] server error: ${error.code || "UNKNOWN"}\n`);
+  process.stderr.write(`[kronos-msp-http] server error: ${error.code || "UNKNOWN"}\\n`);
   process.exitCode = 1;
 });
 
 httpServer.listen(port, host, () => {
-  process.stderr.write(`[kronos-msp-http] listening on ${host}:${port}\n`);
+  process.stderr.write(`[kronos-msp-http] listening on ${host}:${port}\\n`);
 });
 
 async function shutdown(signal: string): Promise<void> {
-  process.stderr.write(`[kronos-msp-http] received ${signal}; shutting down\n`);
+  process.stderr.write(`[kronos-msp-http] received ${signal}; shutting down\\n`);
   httpServer.close(() => {
     void transport.close().finally(() => {
       process.exit(0);
