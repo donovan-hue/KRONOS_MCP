@@ -1,18 +1,14 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import dotenv from "dotenv";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { registerKronosStatusTool } from "./tools/kronos-status.js";
-import { registerKronosHealthTool } from "./tools/kronos-health.js";
-import { registerKronosMeTool } from "./tools/kronos-me.js";
+import { createKronosServer } from "./server.js";
 
-const server = new McpServer({
-  name: "kronos-mcp",
-  version: "0.1.0",
-});
+export { createKronosServer } from "./server.js";
 
-registerKronosStatusTool(server);
-registerKronosHealthTool(server);
-registerKronosMeTool(server);
-
-const transport = new StdioServerTransport();
-
-await server.connect(transport);
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  // Quiet is mandatory: stdout belongs to MCP, not dotenv status messages.
+  dotenv.config({ path: process.env.DOTENV_CONFIG_PATH || ".env", quiet: true, debug: false, override: false });
+  const server = createKronosServer();
+  await server.connect(new StdioServerTransport());
+}

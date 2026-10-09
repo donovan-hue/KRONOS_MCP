@@ -1,0 +1,110 @@
+# KRONOS MCP
+
+Servidor Model Context Protocol local por **stdio** que expone herramientas de lectura conectadas al API existente de KRONOS. No es una API social paralela ni conecta directamente con la base de datos.
+
+## Requisitos
+
+- Node.js 20 o posterior.
+- Una URL HTTPS de KRONOS. `KRONOS_API_URL` es opcional; por defecto usa `https://api.kronos-space.com`.
+- Para ejecutar `kronos_me`, `kronos_status` o `kronos_health`, una credencial MCP de servicio válida como `KRONOS_MCP_TOKEN`. Las tres herramientas están protegidas por permisos comprobados contra `/api/mcp/me`; aunque `/api/health` sea público, `kronos_status` y `kronos_health` exigen autenticación en la capa MCP.
+
+## Instalación y ejecución
+
+```sh
+npm ci
+# No sobrescribir un archivo privado existente.
+[ -e .env ] || cp .env.example .env
+# Edita .env localmente; nunca pegues el secreto en el chat.
+npm run build
+npm start
+```
+
+`src/index.ts` carga `.env` mediante dotenv antes de arrancar el servidor. Variables que el entorno del proceso ya haya inyectado tienen prioridad, conforme al comportamiento de dotenv. `.env` y las variantes `.env.*` están excluidas de Git; `.env.example` es una plantilla sin secretos. Comprueba cualquier archivo local con `git check-ignore -v .env.local` antes de almacenar secretos.
+
+El transporte stdio reserva stdout para mensajes MCP. No añadas `console.log` en el proceso servidor; el texto de operación debe ir por stderr.
+
+## Herramientas existentes
+
+| Nombre | Función | Autenticación | Error/salida |
+|---|---|---|---|
+| `kronos_status` | Lectura compacta del `GET /api/health` público | Requiere permiso MCP `status` comprobado contra `/api/mcp/me` | Salida MCP estructurada; el endpoint upstream sigue siendo público |
+| `kronos_health` | Lectura del `GET /api/health` público | Requiere permiso MCP `health` comprobado contra `/api/mcp/me` | Salida MCP estructurada; un HTTP no exitoso es error de herramienta |
+| `kronos_me` | Consulta identidad y permisos por `GET /api/mcp/me` | Requiere credencial de servicio y permiso MCP `me` | Salida MCP estructurada; requiere credencial configurada y aceptada por KRONOS |
+| `kronos_contracts` | Describe las herramientas, capacidades y contratos declarados por este servidor | Ninguna, no contacta KRONOS | Salida MCP estructurada; `resources` y `prompts` salen vacíos porque aún no se sirve ninguno |
+
+Las cuatro herramientas son de solo lectura. `kronos_status`, `kronos_health` y `kronos_me` exigen respectivamente los permisos `status`, `health` y `me` devueltos por `/api/mcp/me`; la comprobación se ejecuta en el servidor MCP antes de invocar el handler. `kronos_contracts` permanece pública porque solo expone contratos no secretos y no contacta KRONOS. El backend debe conceder los tres scopes exactos a la identidad de servicio para que las herramientas protegidas funcionen. No hay aquí herramientas de búsqueda, perfil, analytics, KAIROS, escritura, publicación ni borrado.
+
+## Contratos
+
+`src/contracts` define el vocabulario compartido (capacidades, herramientas, recursos, prompts, permisos, jobs, proyectos, credenciales y skills). `src/auth/permissions` compara los permisos de `/api/mcp/me` con los declarados en los contratos, y `src/tools/with-tool-authorization.ts` aplica esa comprobación en tiempo de ejecución. Las pruebas unitarias verifican concesión, denegación y fallo cerrado. La compatibilidad de los scopes reales debe confirmarse en el despliegue; este cliente no modifica permisos del backend.
+
+Faltan deliberadamente los contratos de `Provider`, `ProviderAdapter`, `Model`, `Cost` y `Credits`: pertenecen al trabajo de IA generativa y créditos, actualmente en pausa.
+
+## Errores y límites
+
+Los errores MCP usan códigos estables y no incluyen el cuerpo arbitrario de KRONOS: `AUTH_REQUIRED`, `FORBIDDEN`, `CONFIG_INVALID`, `UPSTREAM_TIMEOUT`, `UPSTREAM_UNAVAILABLE`, `UPSTREAM_HTTP_ERROR`, `INVALID_RESPONSE`, `RESPONSE_TOO_LARGE` o `INTERNAL_ERROR`. Cuando existe estado HTTP, se entrega separadamente. Timeout por petición: 10 segundos. Cuerpo máximo: 1 MiB. Redirects rechazados. No se hacen reintentos automáticos.
+
+## Pruebas y build
+
+```sh
+npm test
+npm run build
+```
+
+La suite usa respuestas HTTP simuladas, transporte MCP en memoria y procesos reales por stdio con un fixture HTTP aislado; no requiere credenciales, MongoDB ni API de producción. No constituye prueba de autenticación, scopes o despliegue en producción.
+
+## Verificación real desde Termux (opt-in)
+
+Consulta [el procedimiento y sus límites](docs/VERIFICACION_MCP.md). Requiere que esta versión del proyecto esté disponible en el celular; los cambios de este checkout no se sincronizan automáticamente allí.
+
+Con la credencial ya presente en `.env` o inyectada en el entorno:
+
+```sh
+npm ci
+npm test
+npm run verify:mcp -- --live
+```
+
+Si el archivo privado está en otra ubicación, se puede leer sin copiarlo:
+
+```sh
+npm run verify:mcp -- --live --env-file "/ruta/privada/al/archivo.env"
+```
+
+Sustituye únicamente la ruta. Nunca pases el valor del token por argumento. Las variables ya inyectadas en el proceso tienen prioridad sobre el archivo, incluido un valor vacío. El comando sin `--live` falla antes de cargar secretos o conectar. `npm test` no carga archivos privados, y no llama a APIs externas en sus pruebas (las pruebas de timeout usan HTTP loopback sintético).
+
+El verificador usa el cliente SDK, descubre herramientas, comprueba rechazo de entrada inválida y herramienta desconocida, y llama `kronos_me`, `kronos_status` y `kronos_health`. Una ejecución completa realiza un GET autenticado a `/api/mcp/me` y dos GET públicos a `/api/health`. El backend puede actualizar `lastUsedAt`; no se rota ni revoca nada. La salida contiene solo etapas PASS/FAIL y códigos de error permitidos, nunca valores de identidad, permisos, tokens o cuerpos completos.
+
+El antiguo `tests/mcp-test.ts` fue retirado. La verificación actual está en `scripts/verify-mcp.mjs` y se ejecuta mediante `npm run verify:mcp -- --live`.
+
+## Si `kronos_me` termina en timeout
+
+Consulta [la revisión del flujo y diagnóstico seguro](docs/DIAGNOSTICO_TIMEOUT_ME.md). El endpoint sigue siendo `/api/mcp/me`, con 10 s de plazo total HTTP (cabeceras y cuerpo) y 15 s por petición del verificador MCP. No se ha ampliado el plazo ni cambiado a `/status`.
+
+Después de actualizar y ejecutar `npm test`:
+
+```sh
+npm run diagnose:kronos -- --live
+# O añadir: --env-file "/ruta/real/al/archivo.env"
+```
+
+Realiza dos GET autenticados, `/me` y `/status`, con la misma configuración y sin rotar nada. Informa destino sanitizado, origen de configuración, fase, status y duración, no secretos ni cuerpos. Las dos llamadas pueden actualizar `lastUsedAt`. Su objetivo es diagnosticar desde el entorno que falla, no certificar producción desde pruebas locales.
+
+## Observabilidad
+
+Los eventos se emiten como una línea JSON por evento, **solo en `stderr`**: `stdout` pertenece al protocolo MCP y un solo byte allí corrompe el stream.
+
+Solo se registran primitivas (string, número, booleano, `null`). Cualquier objeto, arreglo o función se sustituye por `[omitted]`, de modo que un token o un cuerpo de respuesta del proveedor **no pueden** filtrarse por olvido.
+
+```sh
+KRONOS_LOG_LEVEL=debug npm start   # debug | info (por defecto) | warn | error
+```
+
+## Variables
+
+- `NODE_ENV`: etiqueta de entorno opcional.
+- `KRONOS_API_URL`: URL base HTTPS opcional.
+- `KRONOS_MCP_TOKEN`: credencial privada para las herramientas protegidas `kronos_me`, `kronos_status` y `kronos_health`; la identidad debe tener los scopes `me`, `status` y `health` correspondientes.
+- `KRONOS_LOG_LEVEL`: nivel mínimo de log opcional; por defecto `info`.
+
+**Nunca guardes tokens en Git, logs o salidas de herramientas.** Emite y rota credenciales por los mecanismos autorizados del backend. No se ha documentado aquí un procedimiento de emisión automática.
