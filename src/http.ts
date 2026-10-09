@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import dotenv from "dotenv";
@@ -43,7 +43,7 @@ function sendJson(res: ServerResponse, status: number, payload: Record<string, s
 
 const mcpServer = createKronosServer();
 const transport = new StreamableHTTPServerTransport({
-  sessionIdGenerator: () => crypto.randomUUID(),
+  sessionIdGenerator: () => randomUUID(),
 });
 await mcpServer.connect(transport);
 
