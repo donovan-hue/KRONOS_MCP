@@ -11,6 +11,7 @@ export const kronosMeContract = readOnlyTool({
   name: "kronos_me",
   description: "Consulta /api/mcp/me con la credencial de servicio KRONOS_MCP_TOKEN. No devuelve ni registra el token.",
   capability: "diagnostics",
+  requiredPermission: "me",
 });
 
 export function registerKronosMeTool(server: McpServer) {

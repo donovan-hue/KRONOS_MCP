@@ -156,7 +156,15 @@ test("kronos_contracts reports registered tools without network or credential", 
     "kronos_status",
   ]);
   assert.ok(payload.tools.every((tool) => tool.readOnly === true));
-  assert.ok(payload.tools.every((tool) => tool.requiredPermission === undefined));
+  assert.deepEqual(
+    Object.fromEntries(payload.tools.map((tool) => [tool.name, tool.requiredPermission])),
+    {
+      kronos_contracts: undefined,
+      kronos_health: "health",
+      kronos_me: "me",
+      kronos_status: "status",
+    },
+  );
 
   // Nothing is served yet, so nothing may be advertised.
   assert.deepEqual(payload.resources, []);

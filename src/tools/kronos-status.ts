@@ -7,8 +7,9 @@ import { withToolAuthorization } from "./with-tool-authorization.js";
 
 export const kronosStatusContract = readOnlyTool({
   name: "kronos_status",
-  description: "Consulta el estado real de KRONOS mediante /api/health (endpoint de salud público; no valida la credencial MCP).",
+  description: "Consulta el estado real de KRONOS mediante /api/health. Requiere el permiso MCP status; el endpoint upstream por sí solo es público.",
   capability: "diagnostics",
+  requiredPermission: "status",
 });
 
 const healthOutput = z.object({
@@ -24,7 +25,7 @@ const healthOutput = z.object({
 
 export function registerKronosStatusTool(server: McpServer) {
   server.registerTool("kronos_status", {
-    description: "Consulta el estado real de KRONOS mediante /api/health (endpoint de salud público; no valida la credencial MCP).",
+    description: "Consulta el estado real de KRONOS mediante /api/health. Requiere el permiso MCP status; el endpoint upstream por sí solo es público.",
     inputSchema: z.object({}).strict(),
     outputSchema: healthOutput,
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },

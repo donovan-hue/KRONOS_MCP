@@ -27,16 +27,16 @@ El transporte stdio reserva stdout para mensajes MCP. No añadas `console.log` e
 
 | Nombre | Función | Autenticación | Error/salida |
 |---|---|---|---|
-| `kronos_status` | Lectura compacta del `GET /api/health` público | No valida credencial MCP | Salida MCP estructurada; no acredita autenticación |
-| `kronos_health` | Lectura del `GET /api/health` público | No valida credencial MCP | Salida MCP estructurada; un HTTP no exitoso es error de herramienta |
-| `kronos_me` | Consulta identidad y permisos por `GET /api/mcp/me` | `KRONOS_MCP_TOKEN` de servicio | Salida MCP estructurada; requiere credencial configurada y aceptada por KRONOS |
+| `kronos_status` | Lectura compacta del `GET /api/health` público | Requiere permiso MCP `status` comprobado contra `/api/mcp/me` | Salida MCP estructurada; el endpoint upstream sigue siendo público |
+| `kronos_health` | Lectura del `GET /api/health` público | Requiere permiso MCP `health` comprobado contra `/api/mcp/me` | Salida MCP estructurada; un HTTP no exitoso es error de herramienta |
+| `kronos_me` | Consulta identidad y permisos por `GET /api/mcp/me` | Requiere credencial de servicio y permiso MCP `me` | Salida MCP estructurada; requiere credencial configurada y aceptada por KRONOS |
 | `kronos_contracts` | Describe las herramientas, capacidades y contratos declarados por este servidor | Ninguna, no contacta KRONOS | Salida MCP estructurada; `resources` y `prompts` salen vacíos porque aún no se sirve ninguno |
 
-Las cuatro herramientas son de solo lectura. `kronos_me` informa permisos devueltos por el backend; este cliente no afirma que KRONOS haga cumplir scopes por herramienta. No hay aquí herramientas de búsqueda, perfil, analytics, KAIROS, escritura, publicación ni borrado.
+Las cuatro herramientas son de solo lectura. `kronos_status`, `kronos_health` y `kronos_me` exigen respectivamente los permisos `status`, `health` y `me` devueltos por `/api/mcp/me`; la comprobación se ejecuta en el servidor MCP antes de invocar el handler. `kronos_contracts` permanece pública porque solo expone contratos no secretos y no contacta KRONOS. El backend debe conceder los tres scopes exactos a la identidad de servicio para que las herramientas protegidas funcionen. No hay aquí herramientas de búsqueda, perfil, analytics, KAIROS, escritura, publicación ni borrado.
 
 ## Contratos
 
-`src/contracts` define el vocabulario compartido (capacidades, herramientas, recursos, prompts, permisos, jobs, proyectos, credenciales y skills). `src/auth/permissions` compara el conjunto de permisos que devuelve `/api/mcp/me` contra lo que declara cada herramienta. **La comprobación está implementada y probada, pero no cableada**: los permisos que concede un despliegue real no se conocen desde este repositorio, así que activarla ahora podría bloquear una identidad que funciona.
+`src/contracts` define el vocabulario compartido (capacidades, herramientas, recursos, prompts, permisos, jobs, proyectos, credenciales y skills). `src/auth/permissions` compara los permisos de `/api/mcp/me` con los declarados en los contratos, y `src/tools/with-tool-authorization.ts` aplica esa comprobación en tiempo de ejecución. Las pruebas unitarias verifican concesión, denegación y fallo cerrado. La compatibilidad de los scopes reales debe confirmarse en el despliegue; este cliente no modifica permisos del backend.
 
 Faltan deliberadamente los contratos de `Provider`, `ProviderAdapter`, `Model`, `Cost` y `Credits`: pertenecen al trabajo de IA generativa y créditos, actualmente en pausa.
 
