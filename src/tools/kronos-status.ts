@@ -3,6 +3,7 @@ import { z } from "zod";
 import { readOnlyTool, toolAnnotations } from "../contracts/tool.js";
 import { getKronosHealth } from "../services/kronos-api.js";
 import { toolError } from "./tool-error.js";
+import { withToolAuthorization } from "./with-tool-authorization.js";
 
 export const kronosStatusContract = readOnlyTool({
   name: "kronos_status",
@@ -27,7 +28,7 @@ export function registerKronosStatusTool(server: McpServer) {
     inputSchema: z.object({}).strict(),
     outputSchema: healthOutput,
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
-  }, async () => {
+  }, withToolAuthorization(kronosStatusContract, async () => {
     try {
       const health = await getKronosHealth();
       const output = {
@@ -37,5 +38,5 @@ export function registerKronosStatusTool(server: McpServer) {
       };
       return { structuredContent: output, content: [{ type: "text", text: JSON.stringify(output, null, 2) }] };
     } catch (error) { return toolError(error); }
-  });
+  }));
 }

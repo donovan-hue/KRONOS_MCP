@@ -3,6 +3,7 @@ import { z } from "zod";
 import { readOnlyTool, toolAnnotations } from "../contracts/tool.js";
 import { getKronosHealth } from "../services/kronos-api.js";
 import { toolError } from "./tool-error.js";
+import { withToolAuthorization } from "./with-tool-authorization.js";
 
 export const kronosHealthContract = readOnlyTool({
   name: "kronos_health",
@@ -24,10 +25,10 @@ export function registerKronosHealthTool(server: McpServer) {
     description: "Devuelve el diagnóstico del endpoint público /api/health. Si KRONOS devuelve HTTP no exitoso, la herramienta informa un error estructurado.",
     inputSchema: z.object({}).strict(), outputSchema: healthOutput,
     annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
-  }, async () => {
+  }, withToolAuthorization(kronosHealthContract, async () => {
     try {
       const health = await getKronosHealth();
       return { structuredContent: health, content: [{ type: "text", text: JSON.stringify(health, null, 2) }] };
     } catch (error) { return toolError(error); }
-  });
+  }));
 }

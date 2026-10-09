@@ -5,6 +5,8 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { KronosApiError, getKronosHealth } from "../src/services/kronos-api.js";
 import { getKronosMe } from "../src/services/kronos-auth.js";
 import { createKronosServer } from "../src/server.js";
+import { readOnlyTool } from "../src/contracts/tool.js";
+import { withToolAuthorization } from "../src/tools/with-tool-authorization.js";
 
 // Test process only: never use inherited real credentials or network access.
 const originalToken = process.env.KRONOS_MCP_TOKEN;
@@ -162,4 +164,72 @@ test("kronos_contracts reports registered tools without network or credential", 
 
   const extraInput = await client.callTool({ name: "kronos_contracts", arguments: { x: 1 } });
   assert.equal(extraInput.isError, true);
+});
+
+
+test("runtime tool authorization allows granted permissions and denies missing ones", async () => {
+  const contract = readOnlyTool({
+    name: "fixture_protected_tool",
+    description: "Test-only protected tool",
+    capability: "diagnostics",
+    requiredPermission: "fixture:read",
+  });
+  let handlerCalls = 0;
+  const handler = async () => {
+    handlerCalls += 1;
+    return { content: [{ type: "text" as const, text: "executed" }] };
+  };
+
+  const allowed = withToolAuthorization(contract, handler, async () => ({
+    ok: true, service: "kronos-mcp", identity: "unit-agent", permissions: ["fixture:read"],
+  }));
+  const allowedResult = await allowed();
+  assert.equal(handlerCalls, 1);
+  assert.notEqual("isError" in allowedResult && allowedResult.isError, true);
+
+  const denied = withToolAuthorization(contract, handler, async () => ({
+    ok: true, service: "kronos-mcp", identity: "unit-agent", permissions: ["fixture:write"],
+  }));
+  const deniedResult = await denied();
+  assert.equal(handlerCalls, 1, "denied tool handler must not execute");
+  assert.equal("isError" in deniedResult && deniedResult.isError, true);
+  assert.match(deniedResult.content[0].text, /FORBIDDEN/);
+});
+
+test("runtime tool authorization fails closed when identity cannot be verified", async () => {
+  const contract = readOnlyTool({
+    name: "fixture_protected_tool",
+    description: "Test-only protected tool",
+    capability: "diagnostics",
+    requiredPermission: "fixture:read",
+  });
+  let handlerCalls = 0;
+  const protectedHandler = withToolAuthorization(contract, async () => {
+    handlerCalls += 1;
+    return { content: [{ type: "text" as const, text: "executed" }] };
+  }, async () => { throw new KronosApiError("AUTH_REQUIRED"); });
+
+  const result = await protectedHandler();
+  assert.equal(handlerCalls, 0, "handler must not execute without verified identity");
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /AUTH_REQUIRED/);
+});
+
+test("runtime tool authorization does not request identity for public contracts", async () => {
+  const contract = readOnlyTool({
+    name: "fixture_public_tool",
+    description: "Test-only public tool",
+    capability: "diagnostics",
+  });
+  let identityReads = 0;
+  const handler = withToolAuthorization(contract, async () => ({
+    content: [{ type: "text" as const, text: "public" }],
+  }), async () => {
+    identityReads += 1;
+    throw new KronosApiError("AUTH_REQUIRED");
+  });
+
+  const result = await handler();
+  assert.equal(identityReads, 0);
+  assert.equal("isError" in result && result.isError, false);
 });

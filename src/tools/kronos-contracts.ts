@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { capabilitySchema, readOnlyTool, toolAnnotations } from "../contracts/index.js";
 import { toolRegistry } from "./registry.js";
+import { withToolAuthorization } from "./with-tool-authorization.js";
 
 /**
  * Introspection tool.
@@ -51,7 +52,7 @@ export function registerKronosContractsTool(server: McpServer): void {
       outputSchema: contractsOutput,
       annotations: toolAnnotations(kronosContractsContract),
     },
-    async () => {
+    withToolAuthorization(kronosContractsContract, async () => {
       const tools = toolRegistry.list().map((contract) => ({
         name: contract.name,
         description: contract.description,
@@ -75,6 +76,6 @@ export function registerKronosContractsTool(server: McpServer): void {
         structuredContent: payload,
         content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }],
       };
-    },
+    }),
   );
 }

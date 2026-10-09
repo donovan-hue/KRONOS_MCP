@@ -3,6 +3,7 @@ import { z } from "zod";
 import { readOnlyTool, toolAnnotations } from "../contracts/tool.js";
 import { getKronosMe } from "../services/kronos-auth.js";
 import { toolError } from "./tool-error.js";
+import { withToolAuthorization } from "./with-tool-authorization.js";
 
 const identityOutput = z.object({ ok: z.boolean(), service: z.string(), identity: z.string(), permissions: z.array(z.string()) }).passthrough();
 
@@ -17,10 +18,10 @@ export function registerKronosMeTool(server: McpServer) {
     description: kronosMeContract.description,
     inputSchema: z.object({}).strict(), outputSchema: identityOutput,
     annotations: toolAnnotations(kronosMeContract),
-  }, async () => {
+  }, withToolAuthorization(kronosMeContract, async () => {
     try {
       const data = await getKronosMe();
       return { structuredContent: data, content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
     } catch (error) { return toolError(error); }
-  });
+  }));
 }

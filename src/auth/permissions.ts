@@ -12,11 +12,9 @@ import {
  * for the service identity. This module compares that set against what a tool,
  * resource or prompt declares. It never invents permissions.
  *
- * ENFORCEMENT STATUS: the helpers are implemented and tested, but they are not
- * yet wired into the registered tools. The exact permission strings a
- * deployment grants are not known from this repository, so enabling enforcement
- * now could lock out a working identity. Wire it once a real `/api/mcp/me`
- * response has been inspected.
+ * Enforcement is applied by `withToolAuthorization` to any registered tool
+ * whose contract declares `requiredPermission`. No permission names are
+ * invented here: each protected contract must use a backend-owned permission.
  */
 
 /** Reads the granted set from an identity payload, tolerating its absence. */
