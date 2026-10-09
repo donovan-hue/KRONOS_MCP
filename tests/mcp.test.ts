@@ -211,7 +211,7 @@ test("runtime tool authorization fails closed when identity cannot be verified",
 
   const result = await protectedHandler();
   assert.equal(handlerCalls, 0, "handler must not execute without verified identity");
-  assert.equal(result.isError, true);
+  assert.equal("isError" in result && result.isError, true);
   assert.match(result.content[0].text, /AUTH_REQUIRED/);
 });
 
