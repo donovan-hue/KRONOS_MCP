@@ -6,7 +6,7 @@ Servidor Model Context Protocol local por **stdio** que expone herramientas de l
 
 - Node.js 20 o posterior.
 - Una URL HTTPS de KRONOS. `KRONOS_API_URL` es opcional; por defecto usa `https://api.kronos-space.com`.
-- Para `kronos_me`, una credencial MCP de servicio válida como `KRONOS_MCP_TOKEN`. Las consultas `kronos_status` y `kronos_health` consultan `/api/health` y no necesitan ni validan esa credencial.
+- Para ejecutar `kronos_me`, `kronos_status` o `kronos_health`, una credencial MCP de servicio válida como `KRONOS_MCP_TOKEN`. Las tres herramientas están protegidas por permisos comprobados contra `/api/mcp/me`; aunque `/api/health` sea público, `kronos_status` y `kronos_health` exigen autenticación en la capa MCP.
 
 ## Instalación y ejecución
 
@@ -104,7 +104,7 @@ KRONOS_LOG_LEVEL=debug npm start   # debug | info (por defecto) | warn | error
 
 - `NODE_ENV`: etiqueta de entorno opcional.
 - `KRONOS_API_URL`: URL base HTTPS opcional.
-- `KRONOS_MCP_TOKEN`: credencial privada requerida únicamente para `kronos_me`.
+- `KRONOS_MCP_TOKEN`: credencial privada para las herramientas protegidas `kronos_me`, `kronos_status` y `kronos_health`; la identidad debe tener los scopes `me`, `status` y `health` correspondientes.
 - `KRONOS_LOG_LEVEL`: nivel mínimo de log opcional; por defecto `info`.
 
 **Nunca guardes tokens en Git, logs o salidas de herramientas.** Emite y rota credenciales por los mecanismos autorizados del backend. No se ha documentado aquí un procedimiento de emisión automática.
