@@ -1,13 +1,15 @@
 {
   "name": "kronos-mcp",
   "version": "0.2.0",
-  "description": "MCP stdio server for KRONOS capabilities",
+  "description": "MCP server for KRONOS capabilities over stdio and Streamable HTTP",
   "main": "dist/index.js",
   "scripts": {
     "test": "npm run build && node --import tsx --test tests/*.test.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:http": "node dist/http.js",
     "dev": "tsx src/index.ts",
+    "dev:http": "tsx src/http.ts",
     "verify:mcp": "node scripts/verify-mcp.mjs",
     "diagnose:kronos": "node scripts/diagnose-kronos.mjs"
   },
