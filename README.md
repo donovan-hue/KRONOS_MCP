@@ -10,24 +10,11 @@ Servidor Model Context Protocol que expone **184 herramientas**: 4 del núcleo (
 
 ## Instalación y ejecución
 
-### Desde npm
+### Desde npm (paquete privado)
 
-Una vez publicada la versión, un cliente MCP puede lanzarlo por stdio sin clonar el repositorio:
+Este paquete **no se publicará como paquete público**. En npm, un nombre sin ámbito como `kronos-mcp` siempre sería público; un paquete privado debe tener ámbito (`@usuario/kronos-mcp` o `@organizacion/kronos-mcp`) y acceso restringido.
 
-```json
-{
-  "mcpServers": {
-    "kronos": {
-      "command": "npx",
-      "args": ["-y", "kronos-mcp"],
-      "env": {
-        "KRONOS_API_URL": "https://api.kronos-space.com",
-        "KRONOS_MCP_TOKEN": "<credencial-de-servicio-para-las-3-herramientas-del-nucleo>"
-      }
-    }
-  }
-}
-```
+Mientras no se fije el ámbito npm real del propietario, el manifiesto mantiene `"private": true`, por lo que `npm publish` está bloqueado y no puede producirse una publicación pública accidental. Cuando el paquete privado esté publicado, el nombre exacto con ámbito se documentará aquí y solo podrán instalarlo las cuentas npm autorizadas; `npx` necesitará una sesión o token npm con permiso de lectura, además de las variables `KRONOS_API_URL`/`KRONOS_MCP_TOKEN` cuando se usen las herramientas protegidas del núcleo.
 
 Sin `KRONOS_MCP_TOKEN`, las 180 herramientas locales y `kronos_contracts` siguen disponibles; las tres herramientas protegidas del núcleo responderán `AUTH_REQUIRED` o `FORBIDDEN`, según corresponda. El transporte HTTP instalado se invoca con el binario `kronos-mcp-http` y sigue exigiendo `MSP_HTTP_BEARER_TOKEN`.
 
@@ -121,23 +108,17 @@ La suite usa respuestas HTTP simuladas, transporte MCP en memoria y procesos rea
 
 Para las 180 herramientas locales, `tests/catalog.test.ts` verifica que el catálogo generado y las definiciones coinciden (180 posiciones, 18 familias, nombres y apodos únicos) y `tests/local-tools.test.ts` llama a las 180 por MCP con su ejemplo, con `fetch` bloqueado, además de comprobar comportamiento concreto de cada familia (grafo con ciclo, webhook HMAC válido, SRT generado, contraste WCAG, cuota agotada, etc.).
 
-## Publicación en npm (mantenedores)
+## Publicación privada en npm (mantenedores)
 
-El paquete está preparado con binarios `kronos-mcp` y `kronos-mcp-http`, lista `files`, tipos TypeScript y licencia ISC. La evidencia completa de la preparación de `0.3.0` está en [docs/EVIDENCIA_NPM_0.3.0.md](docs/EVIDENCIA_NPM_0.3.0.md). Antes de publicar, verifica el tarball tal como lo instalaría un consumidor limpio y haz el ensayo oficial de npm:
+La decisión de distribución es **paquete privado**, no público. El paquete tiene binarios `kronos-mcp` y `kronos-mcp-http`, lista `files`, tipos TypeScript y licencia ISC. La evidencia de empaquetado de `0.3.0` está en [docs/EVIDENCIA_NPM_0.3.0.md](docs/EVIDENCIA_NPM_0.3.0.md), incluida la actualización posterior de visibilidad.
 
-```sh
-npm run verify:tarball
-npm publish --dry-run --access public
-```
+Estado actual de seguridad:
 
-`verify:tarball` instala el `.tgz` en un directorio temporal, enumera las 184 herramientas, llama a las 180 locales y comprueba también el transporte HTTP. La publicación real se hace solo desde una sesión npm del propietario (nunca compartas credenciales o tokens en chats ni en Git):
+- El nombre sigue siendo `kronos-mcp`, sin ámbito. npm no permite que un paquete sin ámbito sea privado.
+- `package.json` contiene `"private": true` y ya no contiene `publishConfig.access: "public"`. Además, `prepublishOnly` ejecuta `scripts/check-private-publish.mjs`, que detiene cualquier `npm publish` —también con `--dry-run`— hasta que el paquete tenga ámbito y acceso `restricted`.
+- `npm run verify:tarball` sigue siendo válido para probar localmente el `.tgz`: instala el artefacto en un directorio temporal, enumera las 184 herramientas, llama a las 180 locales y comprueba el transporte HTTP. Generar un tarball local no lo publica.
 
-```sh
-npm login
-npm whoami
-npm publish --access public
-npm view kronos-mcp version
-```
+Para alojarlo como privado en npm falta un dato del propietario: el **ámbito npm exacto** (`@usuario` u `@organizacion`). También se requiere una cuenta de usuario u organización npm con la función de paquetes privados. Cuando ese ámbito exista, el cambio de publicación será renombrar el paquete a `@ambito/kronos-mcp`, retirar `"private": true`, fijar `publishConfig.access` a `"restricted"`, repetir `npm test` y `npm run verify:tarball`, y publicar desde la sesión npm local del propietario con `npm publish` (nunca `--access public`). Nunca compartas credenciales ni tokens en chats ni en Git.
 
 ## Verificación real desde Termux (opt-in)
 

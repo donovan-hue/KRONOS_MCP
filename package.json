@@ -1,6 +1,7 @@
 {
   "name": "kronos-mcp",
   "version": "0.3.0",
+  "private": true,
   "description": "KRONOS MCP server with connected KRONOS tools and 180 local deterministic tools over stdio and Streamable HTTP",
   "license": "ISC",
   "homepage": "https://github.com/donovan-hue/KRONOS_MCP#readme",
@@ -41,9 +42,6 @@
   "engines": {
     "node": ">=20"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "test": "npm run build && node --import tsx --test tests/*.test.ts",
     "build": "tsc",
@@ -57,7 +55,7 @@
     "diagnose:kronos": "node scripts/diagnose-kronos.mjs",
     "pack:check": "npm pack --dry-run",
     "prepack": "npm run build",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "node scripts/check-private-publish.mjs && npm test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.31.0",

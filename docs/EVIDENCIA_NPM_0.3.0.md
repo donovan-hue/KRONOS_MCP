@@ -4,13 +4,23 @@ Fecha de verificación: 2026-10-19
 Entorno: Node.js v22.22.3, npm 10.9.8  
 Paquete: `kronos-mcp@0.3.0`
 
+## Actualización de visibilidad (decisión posterior)
+
+El propietario decidió que la distribución será **privada**, no pública. Las pruebas siguientes demuestran que el artefacto funciona, incluido el ensayo histórico `--access public`, pero esa ya no es la ruta de publicación autorizada. El manifiesto actual contiene `"private": true` y no contiene `publishConfig.access: "public"`; así, `npm publish` queda bloqueado mientras el nombre siga sin ámbito. Para alojarlo privado en npm todavía hay que fijar el ámbito exacto del propietario (`@usuario/kronos-mcp` u `@organizacion/kronos-mcp`), usar una cuenta npm habilitada para paquetes privados, configurar el acceso como `restricted` y repetir las verificaciones con el nuevo nombre.
+
+Comprobaciones tras aplicar ese candado:
+
+- `npm test`: 92/92, incluida `tests/package-visibility.test.ts`.
+- `npm run verify:tarball`: 184 herramientas por stdio, 180/180 llamadas locales, HTTP 184 y 401 sin token. Esto solo crea e instala un tarball temporal; no contacta con el registro para publicar.
+- En npm 10.9.8, `npm publish --dry-run` no ejecuta la función real de publicación donde `libnpmpublish` rechaza `private: true` con `EPRIVATE`; por eso un dry-run aislado no sirve como prueba de este candado. Se añadió `scripts/check-private-publish.mjs` al inicio de `prepublishOnly` para que incluso el dry-run se detenga con un mensaje explícito mientras falte el ámbito restringido.
+
 ## Veredicto corto
 
 - Las 180 herramientas existen como código ejecutable, no solo como nombres del catálogo.
 - La instalación desde el tarball generado por npm funciona en un proyecto consumidor vacío.
 - Desde ese consumidor, los binarios instalados enumeraron 184 herramientas y ejecutaron correctamente las 180 herramientas locales.
-- `npm publish --dry-run --access public` terminó con código de salida 0.
-- La publicación real todavía requiere iniciar sesión en npm desde una máquina del propietario (`npm login`); este sandbox no tiene una cuenta npm autenticada. No se debe pegar ningún token o contraseña en un chat.
+- `npm publish --dry-run --access public` terminó con código de salida 0 cuando el paquete estaba preparado como público; se conserva como evidencia histórica del empaquetado, no como instrucción actual.
+- La publicación privada real todavía requiere el ámbito npm exacto del propietario, una cuenta habilitada para paquetes privados e iniciar sesión desde su máquina (`npm login`). Este sandbox no tiene una cuenta npm autenticada. No se debe pegar ningún token o contraseña en un chat.
 
 ## Qué significa «desarrolladas desde cero» en este repo
 
@@ -153,9 +163,9 @@ Ejemplos ejecutados contra `dist/` (la Cobertura completa está en las pruebas y
 - #153 `kronos_webhook_validation_gateway` aceptó un HMAC-SHA256 calculado con el secreto de prueba leído por nombre de variable de entorno.
 - #174 `kronos_accessibility_compliance_checker` encontró 4 problemas e informó contraste `4.48:1` frente al mínimo AA `4.5:1`.
 
-## Evidencia 5: ensayo oficial de publicación
+## Evidencia 5: ensayo oficial de publicación (histórico, configuración pública)
 
-Comando ejecutado:
+Este ensayo se ejecutó antes de fijar la decisión de privacidad. Sirve para acreditar que npm aceptaba la estructura del tarball; **no debe repetirse como paso de publicación actual**. Comando ejecutado entonces:
 
 ```sh
 npm publish --dry-run --access public
@@ -178,18 +188,18 @@ EXIT_STATUS=0
 
 `npm view kronos-mcp` devolvió `E404` en el momento de esta verificación, lo que indica que el nombre no aparecía registrado. Eso no reserva el nombre ni sustituye la confirmación final del registro al publicar.
 
-## Lo único pendiente para publicar de verdad
+## Pendiente para publicarlo como privado en npm
 
-En una máquina del propietario, desde un árbol limpio y revisado:
+Con el nombre actual, la publicación está intencionadamente bloqueada. npm exige que un paquete privado tenga ámbito; `kronos-mcp`, sin ámbito, solo podría ser público. El propietario debe confirmar si el ámbito será su usuario npm o una organización npm.
 
-```sh
-npm login
-npm whoami
-npm publish --access public
-npm view kronos-mcp version
-npx -y kronos-mcp
-```
+Cuando ese ámbito y la cuenta con paquetes privados existan, el procedimiento será:
 
-`npm whoami` en este sandbox devuelve `ENEEDAUTH`, por eso no se ejecutó la publicación real aquí. La autenticación puede exigir navegador, passkey o 2FA según la cuenta. Nunca compartas la contraseña ni un token por chat.
+1. Renombrar el paquete a `@ambito/kronos-mcp` y sincronizar `package-lock.json`.
+2. Retirar `"private": true` y fijar `"publishConfig": { "access": "restricted" }`.
+3. Ejecutar `npm test`, `npm run verify:tarball` y `npm publish --dry-run` sin `--access public`.
+4. Desde la máquina del propietario, ejecutar `npm login`, comprobar `npm whoami` y publicar con `npm publish`.
+5. Comprobar con una sesión autorizada que solo las cuentas/equipos con permiso pueden ver e instalar el paquete.
 
-Recomendación operativa: fusionar el PR, etiquetar `v0.3.0` y publicar desde esa etiqueta para que el tarball y el código público sean trazables.
+`npm whoami` en este sandbox devuelve `ENEEDAUTH`, por eso no se ejecutó ninguna publicación real aquí. La autenticación puede exigir navegador, passkey o 2FA según la cuenta. Nunca compartas la contraseña ni un token por chat.
+
+Recomendación operativa: fusionar el PR y etiquetar `v0.3.0` antes de la primera publicación privada, para que el tarball y el código sean trazables.
