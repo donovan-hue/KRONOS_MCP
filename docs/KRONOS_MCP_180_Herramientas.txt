@@ -1,0 +1,654 @@
+KRONOS MCP — CATÁLOGO MAESTRO DE HERRAMIENTAS Versión de trabajo: 1.0 |
+Fecha: 19-10-2026 Total: 180 herramientas organizadas en 18 familias de
+10 herramientas.
+
+CRITERIOS - Cada herramienta tiene un apodo único y un nombre técnico
+real en inglés. - Las descripciones expresan la función prevista, no
+certifican que la herramienta ya esté implementada. - Las integraciones
+con proveedores dependen de APIs, permisos, credenciales y
+disponibilidad. - Las acciones sensibles deben usar validación, permisos
+mínimos, registro de auditoría y recuperación segura. - El catálogo es
+una propuesta de diseño para KRONOS MCP; debe convertirse en
+especificaciones y pruebas antes de producción.
+
+ÍNDICE DE FAMILIAS - 01. Coordinación y enrutamiento inteligente (10
+herramientas) - 02. Diagnóstico, reparación y recuperación (10
+herramientas) - 03. Planificación y objetivos complejos (10
+herramientas) - 04. Simulación, consecuencias y decisiones (10
+herramientas) - 05. Pruebas y evaluación de capacidades (10
+herramientas) - 06. Control de cambios y seguridad operativa (10
+herramientas) - 07. Contexto, memoria y conocimiento (10 herramientas) -
+08. Datos, archivos y transformación (10 herramientas) - 09. Desarrollo
+de software y repositorios (10 herramientas) - 10. Web, búsqueda y
+verificación (10 herramientas) - 11. Multimedia: imagen y diseño visual
+(10 herramientas) - 12. Multimedia: vídeo y movimiento (10
+herramientas) - 13. Multimedia: audio, voz y música (10 herramientas) -
+14. Guion, contenido y publicación (10 herramientas) - 15. Proveedores,
+costes y capacidad (10 herramientas) - 16. Automatización e
+integraciones (10 herramientas) - 17. Observabilidad, métricas y
+rendimiento (10 herramientas) - 18. Experiencia, personalización y
+accesibilidad (10 herramientas)
+
+==============================================================================
+01. COORDINACIÓN Y ENRUTAMIENTO INTELIGENTE
+==============================================================================
+
+1.  Nexo — Compound Tool Constructor Función: Combina herramientas
+    simples en una herramienta compuesta reutilizable.
+
+2.  Brújula — Intelligent Tool Router Función: Selecciona la herramienta
+    adecuada según objetivo, restricciones y contexto.
+
+3.  Director — Multi-Agent Coordinator Función: Distribuye subtareas
+    entre agentes y consolida sus resultados.
+
+4.  Relevo — Task Handoff Manager Función: Transfiere tareas entre
+    herramientas conservando estado y contexto.
+
+5.  Prior — Dynamic Priority Scheduler Función: Ordena tareas por
+    urgencia, impacto, coste y dependencias.
+
+6.  Malla — Dependency Graph Planner Función: Construye y valida el
+    grafo de dependencias de una ejecución.
+
+7.  Confluencia — Parallel Execution Planner Función: Detecta subtareas
+    independientes y propone ejecución paralela.
+
+8.  Compás — Workflow State Tracker Función: Registra estados,
+    transiciones y bloqueos de los flujos.
+
+9.  Umbral — Capability-Based Tool Selector Función: Filtra herramientas
+    según capacidades, permisos y requisitos.
+
+10. Cierre — Workflow Completion Verifier Función: Comprueba criterios
+    de finalización antes de cerrar una tarea.
+
+==============================================================================
+02. DIAGNÓSTICO, REPARACIÓN Y RECUPERACIÓN
+==============================================================================
+
+11. Pulso — System Health Diagnoser Función: Evalúa señales de salud y
+    localiza fallos probables.
+
+12. Remedio — Verified Repair Planner Función: Propone reparaciones con
+    pasos verificables y reversibles.
+
+13. Reintento — Adaptive Retry Controller Función: Ajusta reintentos
+    según tipo de error y política de recuperación.
+
+14. Rescate — Adaptive Task Recovery Función: Recupera tareas
+    interrumpidas desde el último estado consistente.
+
+15. Rastreo — Root Cause Analyzer Función: Relaciona eventos,
+    dependencias y errores para estimar causa raíz.
+
+16. Centinela — Regression Detector Función: Detecta si una reparación
+    introduce regresiones.
+
+17. Válvula — Circuit Breaker Manager Función: Interrumpe llamadas
+    repetidamente fallidas para evitar cascadas.
+
+18. Rebobina — Checkpoint Rollback Engine Función: Restaura un estado
+    previo seguro mediante puntos de control.
+
+19. Aislante — Fault Isolation Engine Función: Aísla el componente
+    defectuoso sin detener todo el flujo.
+
+20. Prueba — Repair Validation Runner Función: Ejecuta comprobaciones
+    posteriores a una reparación.
+
+==============================================================================
+03. PLANIFICACIÓN Y OBJETIVOS COMPLEJOS
+==============================================================================
+
+21. Odisea — Complex Objective Orchestrator Función: Descompone
+    objetivos amplios en hitos y subtareas medibles.
+
+22. Hito — Milestone Planner Función: Define entregables, criterios de
+    aceptación y dependencias.
+
+23. Deriva — Plan Adaptation Engine Función: Recalcula el plan cuando
+    cambian recursos o condiciones.
+
+24. Lente — Goal Clarifier Función: Detecta ambigüedades y genera
+    preguntas de aclaración concretas.
+
+25. Alcance — Scope Boundary Manager Función: Controla inclusiones,
+    exclusiones y cambios de alcance.
+
+26. Tracción — Progress Estimator Función: Estima progreso a partir de
+    tareas completadas y evidencia.
+
+27. Ruta — Alternative Path Finder Función: Encuentra rutas alternativas
+    cuando una dependencia no está disponible.
+
+28. Balance — Resource Allocation Planner Función: Distribuye tiempo,
+    presupuesto y capacidad entre tareas.
+
+29. Horizonte — Long-Horizon Planner Función: Mantiene planes de varios
+    pasos con revisiones periódicas.
+
+30. Entrega — Acceptance Criteria Validator Función: Verifica que el
+    resultado cumpla los criterios acordados.
+
+==============================================================================
+04. SIMULACIÓN, CONSECUENCIAS Y DECISIONES
+==============================================================================
+
+31. Eco — Consequence Simulator Función: Simula efectos previsibles
+    antes de ejecutar una acción.
+
+32. Bifurca — What-If Scenario Engine Función: Compara escenarios
+    alternativos con supuestos explícitos.
+
+33. Riesgo — Risk Scoring Engine Función: Calcula un nivel de riesgo
+    según impacto y probabilidad.
+
+34. Contrapeso — Trade-Off Analyzer Función: Compara calidad, coste,
+    latencia, seguridad y mantenimiento.
+
+35. Faro — Decision Support Engine Función: Presenta opciones ordenadas
+    con evidencia y limitaciones.
+
+36. Umbral de daño — Impact Boundary Checker Función: Detecta acciones
+    con impacto alto o difícil de revertir.
+
+37. Sensibilidad — Sensitivity Analysis Tool Función: Mide qué variables
+    alteran más el resultado estimado.
+
+38. Costo Cero — Cost Forecast Simulator Función: Proyecta consumo y
+    coste antes de ejecutar una cadena.
+
+39. Latencia — Latency Forecast Engine Función: Estima duración según
+    dependencias y rendimiento histórico.
+
+40. Reversa — Reversibility Analyzer Función: Determina si una acción
+    puede deshacerse y cómo.
+
+==============================================================================
+05. PRUEBAS Y EVALUACIÓN DE CAPACIDADES
+==============================================================================
+
+41. Examinador — Capability Test Generator Función: Genera pruebas para
+    validar capacidades declaradas por herramientas.
+
+42. Banco — Tool Benchmark Runner Función: Ejecuta benchmarks repetibles
+    sobre herramientas compatibles.
+
+43. Exacto — Output Accuracy Evaluator Función: Mide exactitud frente a
+    una referencia o criterios definidos.
+
+44. Estrés — Load and Stress Test Generator Función: Diseña pruebas de
+    carga y estrés controladas.
+
+45. Cobertura — Workflow Test Coverage Analyzer Función: Detecta caminos
+    de ejecución que carecen de pruebas.
+
+46. Oráculo — Expected Result Comparator Función: Compara resultados
+    reales con resultados esperados.
+
+47. Consistencia — Repeatability Evaluator Función: Mide variación entre
+    ejecuciones equivalentes.
+
+48. Contrato — Tool Contract Tester Función: Verifica entradas, salidas,
+    errores y límites del contrato.
+
+49. Mutante — Mutation Test Generator Función: Introduce cambios
+    controlados para medir la eficacia de las pruebas.
+
+50. Calibrador — Evaluation Threshold Calibrator Función: Ajusta
+    umbrales de aprobación según objetivos de calidad.
+
+==============================================================================
+06. CONTROL DE CAMBIOS Y SEGURIDAD OPERATIVA
+==============================================================================
+
+51. Guardia — Change Control Manager Función: Requiere autorización y
+    evidencia para cambios sensibles.
+
+52. Bóveda — Secret Exposure Scanner Función: Detecta posibles secretos
+    en texto, registros y artefactos.
+
+53. Permiso — Least-Privilege Policy Enforcer Función: Limita cada
+    herramienta a los permisos estrictamente necesarios.
+
+54. Doble Llave — Approval Gate Controller Función: Solicita
+    confirmación adicional para operaciones críticas.
+
+55. Bitácora — Tamper-Evident Audit Logger Función: Registra decisiones
+    y acciones en una bitácora verificable.
+
+56. Cortafuego — Tool Invocation Policy Filter Función: Bloquea
+    invocaciones que incumplen políticas definidas.
+
+57. Cuarentena — Untrusted Input Sandbox Función: Aísla entradas o
+    archivos no confiables antes de procesarlos.
+
+58. Vigía — Prompt Injection Detector Función: Busca instrucciones
+    hostiles dentro de contenido externo.
+
+59. Huella — Artifact Integrity Verifier Función: Comprueba hashes e
+    integridad de archivos o resultados.
+
+60. Retorno Seguro — Safe Recovery Manager Función: Coordina
+    restauración y validación después de un cambio fallido.
+
+==============================================================================
+07. CONTEXTO, MEMORIA Y CONOCIMIENTO
+==============================================================================
+
+61. Memoria — Scoped Context Store Función: Conserva contexto por
+    proyecto, sesión o tarea con límites definidos.
+
+62. Índice — Knowledge Index Builder Función: Indexa documentos y
+    metadatos para recuperación posterior.
+
+63. Recuerdo — Relevant Memory Retriever Función: Recupera recuerdos
+    pertinentes sin mezclar proyectos.
+
+64. Caducidad — Memory Retention Controller Función: Aplica expiración y
+    políticas de retención al contexto.
+
+65. Procedencia — Source Provenance Tracker Función: Asocia afirmaciones
+    con sus fuentes y fecha de obtención.
+
+66. Consenso — Evidence Reconciliation Engine Función: Resuelve
+    contradicciones entre fuentes sin ocultar incertidumbre.
+
+67. Resumen Vivo — Incremental Context Summarizer Función: Actualiza
+    resúmenes conservando decisiones y restricciones vigentes.
+
+68. Limpieza — Context Deduplication Tool Función: Elimina duplicados y
+    reduce ruido del contexto.
+
+69. Vínculo — Entity Relationship Mapper Función: Relaciona entidades,
+    documentos, tareas y evidencias.
+
+70. Frescura — Knowledge Freshness Checker Función: Identifica
+    información que requiere actualización.
+
+==============================================================================
+08. DATOS, ARCHIVOS Y TRANSFORMACIÓN
+==============================================================================
+
+71. Extractor — Structured Data Extractor Función: Extrae campos
+    estructurados desde documentos y respuestas.
+
+72. Normaliza — Data Normalization Engine Función: Unifica formatos,
+    unidades, fechas y convenciones.
+
+73. Convertidor — Format Conversion Router Función: Convierte entre
+    formatos compatibles y valida el resultado.
+
+74. Lector — Document Content Reader Función: Lee texto, tablas y
+    metadatos de archivos admitidos.
+
+75. Diferencia — File and Data Diff Analyzer Función: Compara versiones
+    y resume diferencias relevantes.
+
+76. Esquema — Schema Inference Tool Función: Infiere esquemas a partir
+    de muestras de datos.
+
+77. Validador — Data Quality Validator Función: Detecta campos ausentes,
+    tipos inválidos y reglas incumplidas.
+
+78. Lote — Batch Processing Coordinator Función: Procesa lotes con
+    límites, seguimiento y recuperación.
+
+79. Fragmenta — Document Chunking Optimizer Función: Divide documentos
+    para búsqueda y recuperación contextual.
+
+80. Ensamble — Data Merge and Reconciliation Función: Combina conjuntos
+    de datos y señala conflictos.
+
+==============================================================================
+09. DESARROLLO DE SOFTWARE Y REPOSITORIOS
+==============================================================================
+
+81. Constructor — Code Scaffold Generator Función: Genera estructuras
+    iniciales de proyecto según requisitos.
+
+82. Inspector — Static Code Analysis Runner Función: Ejecuta o coordina
+    análisis estático del código.
+
+83. Refactor — Safe Refactoring Planner Función: Propone
+    refactorizaciones con alcance y validaciones definidos.
+
+84. Parche — Patch Generation Engine Función: Prepara cambios pequeños
+    asociados a un problema concreto.
+
+85. Dependencia — Dependency Risk Auditor Función: Revisa versiones,
+    licencias y riesgos de dependencias.
+
+86. API Mapa — API Contract Mapper Función: Documenta endpoints,
+    esquemas y contratos entre servicios.
+
+87. Migrador — Schema Migration Planner Función: Planifica migraciones
+    de esquema con comprobaciones de reversión.
+
+88. BuildCheck — Build and Typecheck Runner Función: Coordina
+    compilación, lint y comprobaciones de tipos.
+
+89. Revisor — Pull Request Review Assistant Función: Identifica
+    defectos, riesgos y cambios faltantes en propuestas.
+
+90. Release — Release Readiness Validator Función: Comprueba requisitos
+    previos antes de publicar una versión.
+
+==============================================================================
+10. WEB, BÚSQUEDA Y VERIFICACIÓN
+==============================================================================
+
+91. Radar — Multi-Source Web Search Función: Busca información en
+    múltiples fuentes disponibles.
+
+92. Filtro — Search Result Relevance Ranker Función: Ordena resultados
+    según intención y criterios de relevancia.
+
+93. Verifica — Claim Verification Engine Función: Contrasta afirmaciones
+    con fuentes independientes.
+
+94. Cita — Citation and Link Validator Función: Comprueba
+    correspondencia entre afirmaciones, citas y enlaces.
+
+95. Vigencia — Web Freshness Monitor Función: Detecta páginas o datos
+    que podrían estar desactualizados.
+
+96. Dominio — Domain Reputation Checker Función: Evalúa señales de
+    confianza y procedencia de dominios.
+
+97. Comparador — Source Comparison Analyzer Función: Compara cobertura,
+    fechas y contradicciones entre fuentes.
+
+98. Página — Web Page Structure Extractor Función: Extrae títulos,
+    secciones y datos estructurados de páginas.
+
+99. Alerta Web — Change Monitoring Watcher Función: Detecta cambios en
+    páginas o recursos supervisados.
+
+100. Síntesis — Evidence-Based Research Synthesizer Función: Resume
+     hallazgos separando hechos, inferencias y vacíos.
+
+==============================================================================
+11. MULTIMEDIA: IMAGEN Y DISEÑO VISUAL
+==============================================================================
+
+101. Pixel — Text-to-Image Provider Router Función: Selecciona
+     proveedores de generación de imágenes por calidad y coste.
+
+102. Retoca — Image Editing Orchestrator Función: Coordina edición de
+     imagen con instrucciones y controles.
+
+103. Estilo — Visual Style Consistency Checker Función: Comprueba
+     coherencia de estilo entre piezas visuales.
+
+104. Lienzo — Image Composition Analyzer Función: Evalúa composición,
+     encuadre, jerarquía y legibilidad.
+
+105. Escala — Image Upscaling Router Función: Selecciona procesos de
+     ampliación y mejora compatibles.
+
+106. Máscara — Segmentation and Mask Generator Función: Genera o
+     gestiona máscaras para edición localizada.
+
+107. Fondo — Background Removal Tool Función: Elimina fondos y valida
+     bordes del sujeto.
+
+108. Variantes — Visual Variant Generator Función: Crea variantes
+     controladas de una pieza visual.
+
+109. Marca — Brand Asset Compliance Checker Función: Comprueba colores,
+     logotipos y reglas de marca proporcionadas.
+
+110. Galería — Image Asset Cataloger Función: Etiqueta, clasifica y
+     recupera activos visuales.
+
+==============================================================================
+12. MULTIMEDIA: VÍDEO Y MOVIMIENTO
+==============================================================================
+
+111. Cine — Text-to-Video Provider Router Función: Selecciona
+     proveedores de vídeo por duración, calidad, coste y límites.
+
+112. Montaje — AI Video Editing Orchestrator Función: Coordina cortes,
+     escenas, transiciones y exportación.
+
+113. Toma — Shot and Scene Planner Función: Convierte un guion en tomas
+     y escenas planificadas.
+
+114. Continuidad — Video Continuity Checker Función: Detecta saltos
+     visuales o inconsistencias entre escenas.
+
+115. Movimiento — Motion Generation Router Función: Enruta generación de
+     movimiento según la capacidad requerida.
+
+116. Subtítulo — Subtitle Alignment Engine Función: Sincroniza
+     subtítulos con audio y marcas de tiempo.
+
+117. Recorte — Smart Reframing Tool Función: Reencuadra vídeo para
+     distintas proporciones y plataformas.
+
+118. Clips — Highlight Clip Extractor Función: Extrae segmentos
+     destacados a partir de criterios configurables.
+
+119. Render — Render Queue Coordinator Función: Gestiona colas, estados,
+     reintentos y límites de renderizado.
+
+120. Control de Toma — Video Quality Inspector Función: Evalúa
+     resolución, duración, artefactos y requisitos de salida.
+
+==============================================================================
+13. MULTIMEDIA: AUDIO, VOZ Y MÚSICA
+==============================================================================
+
+121. Voz — Text-to-Speech Provider Router Función: Selecciona motores de
+     voz según idioma, calidad, latencia y precio.
+
+122. Oído — Speech-to-Text Router Función: Enruta transcripción según
+     idioma, precisión y coste.
+
+123. Locutor — Voice Direction Planner Función: Define tono, ritmo y
+     estilo de locución a partir de instrucciones.
+
+124. Ritmo — Music Generation Router Función: Selecciona proveedores de
+     generación musical según restricciones.
+
+125. Mezcla — Audio Mixing Assistant Función: Coordina niveles, balance
+     y mezcla de pistas.
+
+126. Silencio — Silence and Noise Cleaner Función: Detecta silencios y
+     ruido para limpieza de audio.
+
+127. Diarista — Speaker Diarization Tool Función: Identifica segmentos
+     por hablante cuando el proveedor lo permite.
+
+128. Sincronía — Audio-Video Synchronizer Función: Alinea pistas de
+     audio con vídeo y marcas de tiempo.
+
+129. Pronuncia — Pronunciation Quality Checker Función: Detecta
+     pronunciaciones dudosas y propone correcciones.
+
+130. Master — Audio Mastering Quality Checker Función: Evalúa niveles,
+     clipping y parámetros de exportación.
+
+==============================================================================
+14. GUION, CONTENIDO Y PUBLICACIÓN
+==============================================================================
+
+131. Pluma — Script Outline Generator Función: Transforma objetivos en
+     estructuras de guion.
+
+132. Gancho — Opening Hook Optimizer Función: Propone aperturas según
+     audiencia y formato.
+
+133. Narrador — Narrative Consistency Checker Función: Verifica
+     continuidad, tono y coherencia narrativa.
+
+134. Formato — Platform Format Adapter Función: Adapta contenido a
+     límites y formatos de cada plataforma.
+
+135. Calendario — Content Calendar Planner Función: Organiza piezas,
+     fechas, canales y dependencias.
+
+136. Publica — Publishing Workflow Coordinator Función: Coordina
+     preparación, aprobación y publicación mediante integraciones
+     disponibles.
+
+137. Reutiliza — Content Repurposing Engine Función: Transforma una
+     pieza en versiones para otros formatos.
+
+138. Moderador — Content Policy Prechecker Función: Busca posibles
+     incumplimientos antes de publicar.
+
+139. Atribuye — Media Attribution Manager Función: Registra fuentes,
+     licencias y atribuciones de activos.
+
+140. Rendimiento — Content Performance Analyzer Función: Analiza
+     métricas disponibles y propone hipótesis de mejora.
+
+==============================================================================
+15. PROVEEDORES, COSTES Y CAPACIDAD
+==============================================================================
+
+141. Tarifario — Provider Price Catalog Función: Mantiene precios y
+     unidades de cobro obtenidos de fuentes configuradas.
+
+142. Selector — Quality-Cost Provider Optimizer Función: Elige proveedor
+     según límites de calidad, coste y velocidad.
+
+143. Disponibilidad — Provider Availability Monitor Función: Comprueba
+     estados y errores de proveedores integrados.
+
+144. Cuota — Quota and Rate Limit Manager Función: Controla cuotas,
+     límites de frecuencia y ventanas de reinicio.
+
+145. Fallback — Provider Fallback Router Función: Cambia a una
+     alternativa compatible cuando falla el proveedor principal.
+
+146. Medidor — Usage Metering Engine Función: Registra unidades
+     consumidas por tarea y proveedor.
+
+147. Presupuesto — Budget Guardrail Enforcer Función: Detiene o solicita
+     aprobación al alcanzar límites configurados.
+
+148. Calidad — Provider Quality Scorecard Función: Compara proveedores
+     mediante resultados y métricas observadas.
+
+149. Contrato API — Provider API Compatibility Tester Función: Verifica
+     autenticación, parámetros y formatos de respuesta.
+
+150. Catálogo — Capability Registry Manager Función: Registra
+     capacidades, límites, versiones y estado de cada proveedor.
+
+==============================================================================
+16. AUTOMATIZACIÓN E INTEGRACIONES
+==============================================================================
+
+151. Disparador — Event Trigger Manager Función: Inicia flujos ante
+     eventos admitidos y condiciones configuradas.
+
+152. Conector — Integration Adapter Builder Función: Estructura
+     adaptadores para APIs con contratos conocidos.
+
+153. Webhook — Webhook Validation Gateway Función: Valida firmas,
+     esquemas y protección contra repetición.
+
+154. Cola — Reliable Job Queue Manager Función: Gestiona trabajos
+     pendientes, confirmaciones y reintentos.
+
+155. Puente — Cross-Service Message Router Función: Enruta mensajes
+     entre servicios según reglas explícitas.
+
+156. Credencial — Credential Scope Manager Función: Asocia credenciales
+     con servicios y permisos mínimos.
+
+157. Sincroniza — Data Sync Coordinator Función: Coordina sincronización
+     incremental y resolución de conflictos.
+
+158. Programador — Scheduled Workflow Runner Función: Ejecuta flujos con
+     programación y política de errores.
+
+159. Idempotente — Idempotency Key Manager Función: Evita duplicar
+     operaciones al reintentar solicitudes.
+
+160. Webhook Replay — Event Replay and Recovery Tool Función: Reprocesa
+     eventos seleccionados con controles de seguridad.
+
+==============================================================================
+17. OBSERVABILIDAD, MÉTRICAS Y RENDIMIENTO
+==============================================================================
+
+161. Telemetría — Telemetry Collector Función: Centraliza métricas,
+     eventos y trazas disponibles.
+
+162. Cronista — Structured Log Analyzer Función: Agrupa registros y
+     detecta patrones de error.
+
+163. Traza — Distributed Trace Correlator Función: Relaciona una
+     operación entre servicios y herramientas.
+
+164. Cuello — Performance Bottleneck Finder Función: Localiza etapas que
+     dominan la latencia o el consumo.
+
+165. SLO — Service Objective Monitor Función: Supervisa objetivos de
+     disponibilidad y rendimiento definidos.
+
+166. Anomalía — Anomaly Detection Engine Función: Detecta desviaciones
+     frente a patrones históricos.
+
+167. Tablero — Operational Dashboard Builder Función: Genera vistas de
+     estado a partir de métricas disponibles.
+
+168. Incidente — Incident Triage Assistant Función: Prioriza incidentes
+     y reúne evidencias relevantes.
+
+169. Capacidad — Capacity Forecast Planner Función: Estima necesidades
+     futuras de recursos a partir de tendencias.
+
+170. Informe — Operational Report Generator Función: Produce reportes de
+     salud, errores, coste y rendimiento.
+
+==============================================================================
+18. EXPERIENCIA, PERSONALIZACIÓN Y ACCESIBILIDAD
+==============================================================================
+
+171. Perfil — User Preference Resolver Función: Aplica preferencias
+     explícitas de formato, tono y flujo.
+
+172. Atajo — Reusable Workflow Template Builder Función: Convierte
+     flujos aprobados en plantillas reutilizables.
+
+173. Copiloto — Interactive Task Guidance Engine Función: Guía al
+     usuario por pasos y solicita datos faltantes.
+
+174. Accesible — Accessibility Compliance Checker Función: Revisa
+     criterios de accesibilidad aplicables al contenido.
+
+175. Idioma — Localization and Translation Router Función: Enruta
+     traducción y localización según idioma y contexto.
+
+176. Simpleza — Complexity Reduction Assistant Función: Simplifica
+     resultados sin perder restricciones esenciales.
+
+177. Personaliza — Workflow Personalization Engine Función: Adapta
+     flujos a preferencias autorizadas y patrones observados.
+
+178. Explica — Decision Explanation Generator Función: Explica por qué
+     se eligió una herramienta o una ruta.
+
+179. Feedback — User Feedback Triage Tool Función: Clasifica comentarios
+     y los convierte en señales accionables.
+
+180. Aprendiz — Workflow Improvement Miner Función: Identifica mejoras
+     repetibles a partir de ejecuciones evaluadas.
+
+==============================================================================
+NOTAS DE IMPLEMENTACIÓN - No conectar una herramienta a producción sin
+definir esquema de entrada/salida, permisos, límites, errores y
+pruebas. - Para operaciones destructivas o de alto impacto, exigir
+confirmación explícita y plan de reversión. - Separar el catálogo lógico
+de los adaptadores específicos de cada proveedor. - Mantener métricas de
+coste, latencia, calidad, disponibilidad y tasa de error para el
+enrutamiento. - El catálogo puede ampliarse con nuevas familias sin
+renombrar herramientas existentes; los apodos ya asignados deben
+mantenerse únicos.

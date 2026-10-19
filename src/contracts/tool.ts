@@ -44,6 +44,22 @@ export function readOnlyTool(
 }
 
 /**
+ * A local, deterministic tool: it never contacts an external system.
+ *
+ * Pure tools are `readOnly`. A `stateful` local tool only mutates volatile
+ * in-process memory (queues, checkpoints, audit chains), so it is reported as
+ * not read-only while remaining non-destructive and closed-world.
+ */
+export function localTool(
+  contract: Omit<ToolContract, "readOnly" | "destructive" | "openWorld"> & {
+    stateful?: boolean;
+  },
+): ToolContract {
+  const { stateful, ...rest } = contract;
+  return { ...rest, readOnly: !stateful, destructive: false, openWorld: false };
+}
+
+/**
  * In-memory registry of declared tool contracts.
  *
  * Registration is idempotent by name and rejects duplicates with a different
