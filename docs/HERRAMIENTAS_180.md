@@ -19,7 +19,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 7 | `kronos_parallel_execution_planner` | Confluencia | Parallel Execution Planner | Detecta subtareas independientes y propone ejecución paralela. |
 | 8 | `kronos_workflow_state_tracker` | Compás | Workflow State Tracker | Registra estados, transiciones y bloqueos de los flujos. |
 | 9 | `kronos_capability_based_tool_selector` | Umbral | Capability-Based Tool Selector | Filtra herramientas según capacidades, permisos y requisitos. |
-| 10 | `kronos_workflow_completion_verifier` | Cierre | Workflow Completion Verifier | Comprueba criterios de finalización antes de cerrar una tarea. ============================================================================== |
+| 10 | `kronos_workflow_completion_verifier` | Cierre | Workflow Completion Verifier | Comprueba criterios de finalización antes de cerrar una tarea. |
 
 ## 02. Diagnóstico, reparación y recuperación (`diagnostics`)
 
@@ -34,7 +34,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 17 | `kronos_circuit_breaker_manager` | Válvula | Circuit Breaker Manager | Interrumpe llamadas repetidamente fallidas para evitar cascadas. |
 | 18 | `kronos_checkpoint_rollback_engine` | Rebobina | Checkpoint Rollback Engine | Restaura un estado previo seguro mediante puntos de control. |
 | 19 | `kronos_fault_isolation_engine` | Aislante | Fault Isolation Engine | Aísla el componente defectuoso sin detener todo el flujo. |
-| 20 | `kronos_repair_validation_runner` | Prueba | Repair Validation Runner | Ejecuta comprobaciones posteriores a una reparación. ============================================================================== |
+| 20 | `kronos_repair_validation_runner` | Prueba | Repair Validation Runner | Ejecuta comprobaciones posteriores a una reparación. |
 
 ## 03. Planificación y objetivos complejos (`planning`)
 
@@ -49,7 +49,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 27 | `kronos_alternative_path_finder` | Ruta | Alternative Path Finder | Encuentra rutas alternativas cuando una dependencia no está disponible. |
 | 28 | `kronos_resource_allocation_planner` | Balance | Resource Allocation Planner | Distribuye tiempo, presupuesto y capacidad entre tareas. |
 | 29 | `kronos_long_horizon_planner` | Horizonte | Long-Horizon Planner | Mantiene planes de varios pasos con revisiones periódicas. |
-| 30 | `kronos_acceptance_criteria_validator` | Entrega | Acceptance Criteria Validator | Verifica que el resultado cumpla los criterios acordados. ============================================================================== |
+| 30 | `kronos_acceptance_criteria_validator` | Entrega | Acceptance Criteria Validator | Verifica que el resultado cumpla los criterios acordados. |
 
 ## 04. Simulación, consecuencias y decisiones (`simulation`)
 
@@ -64,7 +64,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 37 | `kronos_sensitivity_analysis_tool` | Sensibilidad | Sensitivity Analysis Tool | Mide qué variables alteran más el resultado estimado. |
 | 38 | `kronos_cost_forecast_simulator` | Costo Cero | Cost Forecast Simulator | Proyecta consumo y coste antes de ejecutar una cadena. |
 | 39 | `kronos_latency_forecast_engine` | Latencia | Latency Forecast Engine | Estima duración según dependencias y rendimiento histórico. |
-| 40 | `kronos_reversibility_analyzer` | Reversa | Reversibility Analyzer | Determina si una acción puede deshacerse y cómo. ============================================================================== |
+| 40 | `kronos_reversibility_analyzer` | Reversa | Reversibility Analyzer | Determina si una acción puede deshacerse y cómo. |
 
 ## 05. Pruebas y evaluación de capacidades (`testing`)
 
@@ -79,7 +79,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 47 | `kronos_repeatability_evaluator` | Consistencia | Repeatability Evaluator | Mide variación entre ejecuciones equivalentes. |
 | 48 | `kronos_tool_contract_tester` | Contrato | Tool Contract Tester | Verifica entradas, salidas, errores y límites del contrato. |
 | 49 | `kronos_mutation_test_generator` | Mutante | Mutation Test Generator | Introduce cambios controlados para medir la eficacia de las pruebas. |
-| 50 | `kronos_evaluation_threshold_calibrator` | Calibrador | Evaluation Threshold Calibrator | Ajusta umbrales de aprobación según objetivos de calidad. ============================================================================== |
+| 50 | `kronos_evaluation_threshold_calibrator` | Calibrador | Evaluation Threshold Calibrator | Ajusta umbrales de aprobación según objetivos de calidad. |
 
 ## 06. Control de cambios y seguridad operativa (`security`)
 
@@ -94,7 +94,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 57 | `kronos_untrusted_input_sandbox` | Cuarentena | Untrusted Input Sandbox | Aísla entradas o archivos no confiables antes de procesarlos. |
 | 58 | `kronos_prompt_injection_detector` | Vigía | Prompt Injection Detector | Busca instrucciones hostiles dentro de contenido externo. |
 | 59 | `kronos_artifact_integrity_verifier` | Huella | Artifact Integrity Verifier | Comprueba hashes e integridad de archivos o resultados. |
-| 60 | `kronos_safe_recovery_manager` | Retorno Seguro | Safe Recovery Manager | Coordina restauración y validación después de un cambio fallido. ============================================================================== |
+| 60 | `kronos_safe_recovery_manager` | Retorno Seguro | Safe Recovery Manager | Coordina restauración y validación después de un cambio fallido. |
 
 ## 07. Contexto, memoria y conocimiento (`context`)
 
@@ -109,7 +109,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 67 | `kronos_incremental_context_summarizer` | Resumen Vivo | Incremental Context Summarizer | Actualiza resúmenes conservando decisiones y restricciones vigentes. |
 | 68 | `kronos_context_deduplication_tool` | Limpieza | Context Deduplication Tool | Elimina duplicados y reduce ruido del contexto. |
 | 69 | `kronos_entity_relationship_mapper` | Vínculo | Entity Relationship Mapper | Relaciona entidades, documentos, tareas y evidencias. |
-| 70 | `kronos_knowledge_freshness_checker` | Frescura | Knowledge Freshness Checker | Identifica información que requiere actualización. ============================================================================== |
+| 70 | `kronos_knowledge_freshness_checker` | Frescura | Knowledge Freshness Checker | Identifica información que requiere actualización. |
 
 ## 08. Datos, archivos y transformación (`data`)
 
@@ -124,7 +124,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 77 | `kronos_data_quality_validator` | Validador | Data Quality Validator | Detecta campos ausentes, tipos inválidos y reglas incumplidas. |
 | 78 | `kronos_batch_processing_coordinator` | Lote | Batch Processing Coordinator | Procesa lotes con límites, seguimiento y recuperación. |
 | 79 | `kronos_document_chunking_optimizer` | Fragmenta | Document Chunking Optimizer | Divide documentos para búsqueda y recuperación contextual. |
-| 80 | `kronos_data_merge_and_reconciliation` | Ensamble | Data Merge and Reconciliation | Combina conjuntos de datos y señala conflictos. ============================================================================== |
+| 80 | `kronos_data_merge_and_reconciliation` | Ensamble | Data Merge and Reconciliation | Combina conjuntos de datos y señala conflictos. |
 
 ## 09. Desarrollo de software y repositorios (`development`)
 
@@ -139,7 +139,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 87 | `kronos_schema_migration_planner` | Migrador | Schema Migration Planner | Planifica migraciones de esquema con comprobaciones de reversión. |
 | 88 | `kronos_build_and_typecheck_runner` | BuildCheck | Build and Typecheck Runner | Coordina compilación, lint y comprobaciones de tipos. |
 | 89 | `kronos_pull_request_review_assistant` | Revisor | Pull Request Review Assistant | Identifica defectos, riesgos y cambios faltantes en propuestas. |
-| 90 | `kronos_release_readiness_validator` | Release | Release Readiness Validator | Comprueba requisitos previos antes de publicar una versión. ============================================================================== |
+| 90 | `kronos_release_readiness_validator` | Release | Release Readiness Validator | Comprueba requisitos previos antes de publicar una versión. |
 
 ## 10. Web, búsqueda y verificación (`web`)
 
@@ -154,7 +154,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 97 | `kronos_source_comparison_analyzer` | Comparador | Source Comparison Analyzer | Compara cobertura, fechas y contradicciones entre fuentes. |
 | 98 | `kronos_web_page_structure_extractor` | Página | Web Page Structure Extractor | Extrae títulos, secciones y datos estructurados de páginas. |
 | 99 | `kronos_change_monitoring_watcher` | Alerta Web | Change Monitoring Watcher | Detecta cambios en páginas o recursos supervisados. |
-| 100 | `kronos_evidence_based_research_synthesizer` | Síntesis | Evidence-Based Research Synthesizer | Resume hallazgos separando hechos, inferencias y vacíos. ============================================================================== |
+| 100 | `kronos_evidence_based_research_synthesizer` | Síntesis | Evidence-Based Research Synthesizer | Resume hallazgos separando hechos, inferencias y vacíos. |
 
 ## 11. Multimedia: imagen y diseño visual (`image`)
 
@@ -169,7 +169,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 107 | `kronos_background_removal_tool` | Fondo | Background Removal Tool | Elimina fondos y valida bordes del sujeto. |
 | 108 | `kronos_visual_variant_generator` | Variantes | Visual Variant Generator | Crea variantes controladas de una pieza visual. |
 | 109 | `kronos_brand_asset_compliance_checker` | Marca | Brand Asset Compliance Checker | Comprueba colores, logotipos y reglas de marca proporcionadas. |
-| 110 | `kronos_image_asset_cataloger` | Galería | Image Asset Cataloger | Etiqueta, clasifica y recupera activos visuales. ============================================================================== |
+| 110 | `kronos_image_asset_cataloger` | Galería | Image Asset Cataloger | Etiqueta, clasifica y recupera activos visuales. |
 
 ## 12. Multimedia: vídeo y movimiento (`video`)
 
@@ -184,7 +184,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 117 | `kronos_smart_reframing_tool` | Recorte | Smart Reframing Tool | Reencuadra vídeo para distintas proporciones y plataformas. |
 | 118 | `kronos_highlight_clip_extractor` | Clips | Highlight Clip Extractor | Extrae segmentos destacados a partir de criterios configurables. |
 | 119 | `kronos_render_queue_coordinator` | Render | Render Queue Coordinator | Gestiona colas, estados, reintentos y límites de renderizado. |
-| 120 | `kronos_video_quality_inspector` | Control de Toma | Video Quality Inspector | Evalúa resolución, duración, artefactos y requisitos de salida. ============================================================================== |
+| 120 | `kronos_video_quality_inspector` | Control de Toma | Video Quality Inspector | Evalúa resolución, duración, artefactos y requisitos de salida. |
 
 ## 13. Multimedia: audio, voz y música (`audio`)
 
@@ -199,7 +199,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 127 | `kronos_speaker_diarization_tool` | Diarista | Speaker Diarization Tool | Identifica segmentos por hablante cuando el proveedor lo permite. |
 | 128 | `kronos_audio_video_synchronizer` | Sincronía | Audio-Video Synchronizer | Alinea pistas de audio con vídeo y marcas de tiempo. |
 | 129 | `kronos_pronunciation_quality_checker` | Pronuncia | Pronunciation Quality Checker | Detecta pronunciaciones dudosas y propone correcciones. |
-| 130 | `kronos_audio_mastering_quality_checker` | Master | Audio Mastering Quality Checker | Evalúa niveles, clipping y parámetros de exportación. ============================================================================== |
+| 130 | `kronos_audio_mastering_quality_checker` | Master | Audio Mastering Quality Checker | Evalúa niveles, clipping y parámetros de exportación. |
 
 ## 14. Guion, contenido y publicación (`content`)
 
@@ -214,7 +214,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 137 | `kronos_content_repurposing_engine` | Reutiliza | Content Repurposing Engine | Transforma una pieza en versiones para otros formatos. |
 | 138 | `kronos_content_policy_prechecker` | Moderador | Content Policy Prechecker | Busca posibles incumplimientos antes de publicar. |
 | 139 | `kronos_media_attribution_manager` | Atribuye | Media Attribution Manager | Registra fuentes, licencias y atribuciones de activos. |
-| 140 | `kronos_content_performance_analyzer` | Rendimiento | Content Performance Analyzer | Analiza métricas disponibles y propone hipótesis de mejora. ============================================================================== |
+| 140 | `kronos_content_performance_analyzer` | Rendimiento | Content Performance Analyzer | Analiza métricas disponibles y propone hipótesis de mejora. |
 
 ## 15. Proveedores, costes y capacidad (`providers`)
 
@@ -229,7 +229,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 147 | `kronos_budget_guardrail_enforcer` | Presupuesto | Budget Guardrail Enforcer | Detiene o solicita aprobación al alcanzar límites configurados. |
 | 148 | `kronos_provider_quality_scorecard` | Calidad | Provider Quality Scorecard | Compara proveedores mediante resultados y métricas observadas. |
 | 149 | `kronos_provider_api_compatibility_tester` | Contrato API | Provider API Compatibility Tester | Verifica autenticación, parámetros y formatos de respuesta. |
-| 150 | `kronos_capability_registry_manager` | Catálogo | Capability Registry Manager | Registra capacidades, límites, versiones y estado de cada proveedor. ============================================================================== |
+| 150 | `kronos_capability_registry_manager` | Catálogo | Capability Registry Manager | Registra capacidades, límites, versiones y estado de cada proveedor. |
 
 ## 16. Automatización e integraciones (`automation`)
 
@@ -244,7 +244,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 157 | `kronos_data_sync_coordinator` | Sincroniza | Data Sync Coordinator | Coordina sincronización incremental y resolución de conflictos. |
 | 158 | `kronos_scheduled_workflow_runner` | Programador | Scheduled Workflow Runner | Ejecuta flujos con programación y política de errores. |
 | 159 | `kronos_idempotency_key_manager` | Idempotente | Idempotency Key Manager | Evita duplicar operaciones al reintentar solicitudes. |
-| 160 | `kronos_event_replay_and_recovery_tool` | Webhook Replay | Event Replay and Recovery Tool | Reprocesa eventos seleccionados con controles de seguridad. ============================================================================== |
+| 160 | `kronos_event_replay_and_recovery_tool` | Webhook Replay | Event Replay and Recovery Tool | Reprocesa eventos seleccionados con controles de seguridad. |
 
 ## 17. Observabilidad, métricas y rendimiento (`observability`)
 
@@ -259,7 +259,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 167 | `kronos_operational_dashboard_builder` | Tablero | Operational Dashboard Builder | Genera vistas de estado a partir de métricas disponibles. |
 | 168 | `kronos_incident_triage_assistant` | Incidente | Incident Triage Assistant | Prioriza incidentes y reúne evidencias relevantes. |
 | 169 | `kronos_capacity_forecast_planner` | Capacidad | Capacity Forecast Planner | Estima necesidades futuras de recursos a partir de tendencias. |
-| 170 | `kronos_operational_report_generator` | Informe | Operational Report Generator | Produce reportes de salud, errores, coste y rendimiento. ============================================================================== |
+| 170 | `kronos_operational_report_generator` | Informe | Operational Report Generator | Produce reportes de salud, errores, coste y rendimiento. |
 
 ## 18. Experiencia, personalización y accesibilidad (`experience`)
 
@@ -274,7 +274,7 @@ Las 4 herramientas del núcleo KRONOS (`kronos_status`, `kronos_health`, `kronos
 | 177 | `kronos_workflow_personalization_engine` | Personaliza | Workflow Personalization Engine | Adapta flujos a preferencias autorizadas y patrones observados. |
 | 178 | `kronos_decision_explanation_generator` | Explica | Decision Explanation Generator | Explica por qué se eligió una herramienta o una ruta. |
 | 179 | `kronos_user_feedback_triage_tool` | Feedback | User Feedback Triage Tool | Clasifica comentarios y los convierte en señales accionables. |
-| 180 | `kronos_workflow_improvement_miner` | Aprendiz | Workflow Improvement Miner | Identifica mejoras repetibles a partir de ejecuciones evaluadas. ============================================================================== |
+| 180 | `kronos_workflow_improvement_miner` | Aprendiz | Workflow Improvement Miner | Identifica mejoras repetibles a partir de ejecuciones evaluadas. |
 
 ## Notas
 

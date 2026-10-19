@@ -60,6 +60,7 @@ for (const line of lines) {
     continue;
   }
   if (line.startsWith("NOTAS DE IMPLEMENTACIÓN")) current = null;
+  if (/^={10,}$/.test(line.trim())) { previousLine = line; continue; }
   if (current) current.body.push(line);
   previousLine = line;
 }
