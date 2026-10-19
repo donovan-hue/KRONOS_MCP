@@ -108,3 +108,24 @@ KRONOS_LOG_LEVEL=debug npm start   # debug | info (por defecto) | warn | error
 - `KRONOS_LOG_LEVEL`: nivel mínimo de log opcional; por defecto `info`.
 
 **Nunca guardes tokens en Git, logs o salidas de herramientas.** Emite y rota credenciales por los mecanismos autorizados del backend. No se ha documentado aquí un procedimiento de emisión automática.
+
+
+## Transporte HTTP público (MCP Streamable HTTP)
+
+El transporte HTTP se ejecuta como proceso independiente del modo `stdio`; ambos reutilizan los mismos contratos y herramientas. Para desarrollo local:
+
+```sh
+npm ci
+npm run build
+MSP_HTTP_BEARER_TOKEN="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')" npm run start:http
+```
+
+- Endpoint MCP: `/mcp` (requiere `Authorization: Bearer <MSP_HTTP_BEARER_TOKEN>`).
+- Health check del alojamiento: `/healthz` (solo indica que el proceso responde; no revela estado interno de KRONOS).
+- Puerto: `PORT` del proveedor, o `MSP_HTTP_PORT` (predeterminado `3000`).
+- Host: `MSP_HTTP_HOST` (predeterminado `0.0.0.0`).
+- Si falta el token o tiene menos de 32 caracteres, el proceso HTTP no arranca.
+- No se configura CORS ni se habilitan herramientas nuevas. Se conserva la autorización por scopes existente para las herramientas protegidas.
+- En alojamiento público, configura HTTPS en el proveedor y guarda el token como secreto del entorno; nunca lo guardes en Git ni en el frontend.
+
+**Límite de la primera versión:** el bearer token es una credencial compartida para una instalación controlada/piloto, no un sistema multiusuario. Antes de distribuir el endpoint a usuarios finales, debe añadirse identidad individual/OAuth, rotación y revocación de credenciales, límites de uso y auditoría por cliente. No publiques el token en una aplicación web ni lo incrustes en SDKs distribuidos.
