@@ -32,6 +32,21 @@ export const CAPABILITIES = [
   "project",
   "library",
   "publishing",
+  // Familias del catálogo maestro de 180 herramientas (docs/KRONOS_MCP_180_Herramientas.txt).
+  "coordination",
+  "planning",
+  "simulation",
+  "testing",
+  "security",
+  "context",
+  "data",
+  "development",
+  "web",
+  "content",
+  "providers",
+  "automation",
+  "observability",
+  "experience",
 ] as const;
 
 export const capabilitySchema = z.enum(CAPABILITIES);

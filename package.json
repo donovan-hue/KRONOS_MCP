@@ -1,6 +1,6 @@
 {
   "name": "kronos-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for KRONOS capabilities over stdio and Streamable HTTP",
   "main": "dist/index.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "start:http": "node dist/http.js",
     "dev": "tsx src/index.ts",
     "dev:http": "tsx src/http.ts",
+    "generate:catalog": "node scripts/generate-catalog.mjs",
     "verify:mcp": "node scripts/verify-mcp.mjs",
     "diagnose:kronos": "node scripts/diagnose-kronos.mjs"
   },

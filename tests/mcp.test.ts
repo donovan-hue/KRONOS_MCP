@@ -112,14 +112,23 @@ test("MCP advertises existing tools, structured output, and rejects extra input"
   t.after(async () => { await client.close(); await server.close(); });
 
   const { tools } = await client.listTools();
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), [
-    "kronos_contracts",
-    "kronos_health",
-    "kronos_me",
-    "kronos_status",
-  ]);
+  const toolNames = new Set(tools.map((tool) => tool.name));
+  // Núcleo existente (4) + las 180 herramientas locales del catálogo maestro.
+  assert.equal(tools.length, 184);
+  for (const core of ["kronos_contracts", "kronos_health", "kronos_me", "kronos_status"]) {
+    assert.ok(toolNames.has(core), `falta ${core}`);
+  }
   assert.ok(tools.every((tool) => tool.outputSchema));
-  assert.ok(tools.every((tool) => tool.annotations?.readOnlyHint === true));
+  assert.ok(tools.every((tool) => tool.annotations?.destructiveHint === false));
+  const byName = new Map(tools.map((tool) => [tool.name, tool]));
+  assert.equal(byName.get("kronos_status")?.annotations?.readOnlyHint, true);
+  assert.equal(byName.get("kronos_status")?.annotations?.openWorldHint, true);
+  // Herramienta local pura: read-only y cerrada al mundo exterior.
+  assert.equal(byName.get("kronos_risk_scoring_engine")?.annotations?.readOnlyHint, true);
+  assert.equal(byName.get("kronos_risk_scoring_engine")?.annotations?.openWorldHint, false);
+  // Herramienta local con estado en memoria: no es read-only, sigue sin salir.
+  assert.equal(byName.get("kronos_scoped_context_store")?.annotations?.readOnlyHint, false);
+  assert.equal(byName.get("kronos_scoped_context_store")?.annotations?.openWorldHint, false);
   const badInput = await client.callTool({ name: "kronos_status", arguments: { unexpected: true } });
   assert.equal(badInput.isError, true);
   assert.match(JSON.stringify(badInput), /Input validation error/);
@@ -148,23 +157,29 @@ test("kronos_contracts reports registered tools without network or credential", 
   };
 
   assert.equal(payload.service, "kronos-mcp");
-  assert.deepEqual(payload.capabilities, ["diagnostics"]);
-  assert.deepEqual(payload.tools.map((tool) => tool.name).sort(), [
-    "kronos_contracts",
-    "kronos_health",
-    "kronos_me",
-    "kronos_status",
-  ]);
-  assert.ok(payload.tools.every((tool) => tool.readOnly === true));
-  assert.deepEqual(
-    Object.fromEntries(payload.tools.map((tool) => [tool.name, tool.requiredPermission])),
-    {
-      kronos_contracts: undefined,
-      kronos_health: "health",
-      kronos_me: "me",
-      kronos_status: "status",
-    },
+  // 18 capacidades: diagnostics del núcleo + una por familia del catálogo.
+  assert.equal(payload.capabilities.length, 18);
+  assert.ok(payload.capabilities.includes("diagnostics"));
+  assert.ok(payload.capabilities.includes("coordination"));
+  assert.ok(payload.capabilities.includes("experience"));
+  assert.equal(payload.tools.length, 184);
+  const contractsByName = new Map(payload.tools.map((tool) => [tool.name, tool]));
+  for (const core of ["kronos_contracts", "kronos_health", "kronos_me", "kronos_status"]) {
+    assert.ok(contractsByName.has(core), `falta ${core}`);
+    assert.equal(contractsByName.get(core)?.readOnly, true);
+  }
+  // Solo el núcleo exige permisos del backend; las 180 locales no contactan KRONOS.
+  assert.equal(contractsByName.get("kronos_contracts")?.requiredPermission, undefined);
+  assert.equal(contractsByName.get("kronos_health")?.requiredPermission, "health");
+  assert.equal(contractsByName.get("kronos_me")?.requiredPermission, "me");
+  assert.equal(contractsByName.get("kronos_status")?.requiredPermission, "status");
+  assert.equal(
+    payload.tools.filter((tool) => tool.requiredPermission !== undefined).length,
+    3,
   );
+  // Las puras son readOnly; las de estado en memoria declaran readOnly=false.
+  assert.equal(contractsByName.get("kronos_risk_scoring_engine")?.readOnly, true);
+  assert.equal(contractsByName.get("kronos_scoped_context_store")?.readOnly, false);
 
   // Nothing is served yet, so nothing may be advertised.
   assert.deepEqual(payload.resources, []);
