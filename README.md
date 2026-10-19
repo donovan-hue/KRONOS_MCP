@@ -16,7 +16,7 @@ Este paquete **no se publicará como paquete público**. En npm, un nombre sin �
 
 Mientras no se fije el ámbito npm real del propietario, el manifiesto mantiene `"private": true`, por lo que `npm publish` está bloqueado y no puede producirse una publicación pública accidental. Cuando el paquete privado esté publicado, el nombre exacto con ámbito se documentará aquí y solo podrán instalarlo las cuentas npm autorizadas; `npx` necesitará una sesión o token npm con permiso de lectura, además de las variables `KRONOS_API_URL`/`KRONOS_MCP_TOKEN` cuando se usen las herramientas protegidas del núcleo.
 
-Sin `KRONOS_MCP_TOKEN`, las 180 herramientas locales y `kronos_contracts` siguen disponibles; las tres herramientas protegidas del núcleo responderán `AUTH_REQUIRED` o `FORBIDDEN`, según corresponda. El transporte HTTP instalado se invoca con el binario `kronos-mcp-http` y sigue exigiendo `MSP_HTTP_BEARER_TOKEN`.
+Sin `KRONOS_MCP_TOKEN`, las 180 herramientas locales y `kronos_contracts` siguen disponibles en el servidor completo; las tres herramientas protegidas del núcleo responderán `AUTH_REQUIRED` o `FORBIDDEN`, según corresponda. El transporte HTTP instalado se invoca con el binario `kronos-mcp-http`: su perfil `authenticated` exige `MSP_HTTP_BEARER_TOKEN`, mientras que `public-local` sirve sin credenciales solo las 163 herramientas locales sin estado aptas para exposición anónima.
 
 ### Desde el código fuente
 
@@ -50,7 +50,7 @@ El [catálogo maestro](docs/KRONOS_MCP_180_Herramientas.txt) (180 herramientas, 
 
 Cómo deciden ser honestas:
 
-- **Trabajan solo con los datos de cada llamada** (más, en 15 casos, memoria del proceso). Nada de red, disco, comandos del sistema ni claves de proveedor. Por eso no exigen permiso de `/api/mcp/me`, igual que `kronos_contracts`. En el transporte HTTP quedan tras el bearer token del propio MCP.
+- **Trabajan solo con los datos de cada llamada** (más, en 15 casos, memoria del proceso). Nada de red, disco, comandos del sistema ni claves de proveedor. Por eso no exigen permiso de `/api/mcp/me`, igual que `kronos_contracts`. En HTTP, el perfil completo las protege con el Bearer del MCP; el perfil `public-local` registra únicamente el subconjunto sin estado apto para acceso anónimo.
 - Las que según el catálogo «eligen proveedor» o «generan» un activo (Pixel, Cine, Voz…) realizan el **enrutamiento, la planificación, el cálculo o la verificación** con los candidatos que aporta el llamante, y lo declaran en el campo `limitations`. Nunca afirman haber generado una imagen, un vídeo o una búsqueda web en vivo que no ocurrió.
 - Todas responden con el mismo sobre estructurado: `ok`, `tool`, `number` (1-180), `nickname`, `technicalName`, `family`, `mode: "local_deterministic"`, `summary`, `data`, `warnings` y `limitations`. El nombre MCP es `kronos_` + nombre técnico en snake_case (p. ej. `kronos_secret_exposure_scanner`, apodo «Bóveda»).
 - **15 herramientas guardan estado solo en memoria del proceso** (se reconoce porque su anotación `readOnlyHint` es `false`; las demás son `readOnlyHint: true`, `openWorldHint: false`, `destructiveHint: false`). Son las que por diseño necesitan estado entre llamadas: registro de compuestas y de estados de flujo (1, 8), circuit breaker y checkpoints (17, 18), aprobaciones y bitácora (54, 55), contexto e índice (61, 62), cola de render (119), tarifario, cuotas y registro de capacidades (141, 144, 150), cola de trabajos e idempotencia (154, 159) y colector de Telemetría (161). Al reiniciar el servidor, ese estado desaparece. **No pases secretos** a las herramientas de estado: quedarían en la memoria del proceso y en manos de quien llame después. La única verificación con secreto, `kronos_webhook_validation_gateway`, recibe el **nombre** de la variable de entorno (`secretEnvVar`), nunca el valor.
@@ -177,23 +177,46 @@ KRONOS_LOG_LEVEL=debug npm start   # debug | info (por defecto) | warn | error
 **Nunca guardes tokens en Git, logs o salidas de herramientas.** Emite y rota credenciales por los mecanismos autorizados del backend. No se ha documentado aquí un procedimiento de emisión automática.
 
 
-## Transporte HTTP público (MCP Streamable HTTP)
+## Transporte HTTP y despliegue (MCP Streamable HTTP)
 
-El transporte HTTP se ejecuta como proceso independiente del modo `stdio`; ambos reutilizan los mismos contratos y herramientas. Para desarrollo local:
+El transporte HTTP se ejecuta como proceso independiente del modo `stdio` y admite dos perfiles. La guía completa, con el Blueprint de Render y la verificación posterior, está en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
+
+### `authenticated`: servidor completo y controlado
+
+Es el perfil predeterminado. Sirve las 184 herramientas tras un Bearer compartido:
 
 ```sh
 npm ci
 npm run build
-MSP_HTTP_BEARER_TOKEN="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')" npm run start:http
+MSP_HTTP_PROFILE=authenticated \
+MSP_HTTP_BEARER_TOKEN="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')" \
+npm run start:http
 ```
 
 - Endpoint MCP: `/mcp` (requiere `Authorization: Bearer <MSP_HTTP_BEARER_TOKEN>`).
-- Health check del alojamiento: `/healthz` (solo indica que el proceso responde; no revela estado interno de KRONOS).
+- Si falta el token o tiene menos de 32 caracteres, el proceso no arranca.
+- Se conserva la autorización por scopes de las herramientas del núcleo.
+- Todas las sesiones con el mismo token comparten el estado en memoria de las 15 herramientas con estado; úsalo solo en instalaciones controladas.
+- Este Bearer no es OAuth y ChatGPT no puede presentarlo como API key personalizada. No lo entregues a ChatGPT ni lo incrustes en aplicaciones distribuidas.
+
+### `public-local`: endpoint anónimo para ChatGPT
+
+Este perfil no usa credenciales y sirve solo **163 herramientas locales sin estado**. Excluye el núcleo conectado, `kronos_contracts`, las 15 herramientas con memoria compartida, el benchmark que ejecuta otras herramientas y el validador de webhooks que lee secretos del entorno:
+
+```sh
+npm ci
+npm run build
+MSP_HTTP_PROFILE=public-local npm run start:http
+```
+
+Es el perfil definido en [`render.yaml`](render.yaml) para conectar ChatGPT con autenticación `No Auth`. Incluye por defecto un límite de cuerpo de 2 MiB y 240 peticiones HTTP por minuto e IP. No sustituye al despliegue conectado: `kronos_status` y `kronos_me` seguirán requiriendo OAuth 2.1 compatible con MCP o una prueba privada con Secure MCP Tunnel.
+
+### Común a ambos perfiles
+
+- Health check del alojamiento: `/healthz` (solo indica que el proceso responde y declara el perfil; no revela el estado interno de KRONOS).
 - Puerto: `PORT` del proveedor, o `MSP_HTTP_PORT` (predeterminado `3000`).
 - Host: `MSP_HTTP_HOST` (predeterminado `0.0.0.0`).
-- Si falta el token o tiene menos de 32 caracteres, el proceso HTTP no arranca.
-- No se configura CORS. El transporte HTTP sirve el mismo conjunto de 184 herramientas que stdio (las 180 locales incluidas) tras el bearer token. Se conserva la autorización por scopes existente para las herramientas del núcleo protegidas. **Ojo con publicación:** como el token es compartido, todas las sesiones comparten también el estado en memoria de las 15 herramientas con estado (contexto, bitácora, colas…); úsalo solo en instalaciones controladas.
-- En alojamiento público, configura HTTPS en el proveedor y guarda el token como secreto del entorno; nunca lo guardes en Git ni en el frontend.
-
-**Límite de la primera versión:** el bearer token es una credencial compartida para una instalación controlada/piloto, no un sistema multiusuario. Antes de distribuir el endpoint a usuarios finales, debe añadirse identidad individual/OAuth, rotación y revocación de credenciales, límites de uso y auditoría por cliente. No publiques el token en una aplicación web ni lo incrustes en SDKs distribuidos.
-ni lo incrustes en SDKs distribuidos.
+- Tamaño máximo del cuerpo: `MSP_HTTP_MAX_BODY_BYTES` (predeterminado `2097152`).
+- Límite por minuto: `MSP_HTTP_RATE_LIMIT_PER_MINUTE` (`240` en `public-local`; desactivado por defecto en `authenticated`).
+- No se configura CORS.
+- En alojamiento público, configura HTTPS en el proveedor y guarda cualquier secreto solo en su entorno; nunca en Git ni en el frontend.

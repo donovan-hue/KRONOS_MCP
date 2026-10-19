@@ -7,6 +7,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { createKronosServer } from "./server.js";
 
 export { createKronosServer } from "./server.js";
+export type { CreateKronosServerOptions, KronosServerProfile } from "./server.js";
 
 function isMainModule(): boolean {
   if (!process.argv[1]) return false;

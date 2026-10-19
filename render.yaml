@@ -1,0 +1,31 @@
+# Despliegue público para ChatGPT en modo sin autenticación.
+#
+# Este Blueprint usa deliberadamente `MSP_HTTP_PROFILE=public-local`:
+# expone solo 163 herramientas locales sin estado. No publica el núcleo
+# conectado a KRONOS, ni usa `KRONOS_MCP_TOKEN`, ni comparte la memoria de
+# las 15 herramientas con estado entre llamantes anónimos.
+services:
+  - type: web
+    runtime: node
+    name: kronos-space-mcp
+    repo: https://github.com/donovan-hue/KRONOS_MCP
+    branch: main
+    plan: free
+    region: oregon
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:http
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: MSP_HTTP_PROFILE
+        value: public-local
+      - key: MSP_HTTP_MAX_BODY_BYTES
+        value: "2097152"
+      - key: MSP_HTTP_RATE_LIMIT_PER_MINUTE
+        value: "240"
+      - key: MSP_HTTP_TRUST_PROXY
+        value: "true"

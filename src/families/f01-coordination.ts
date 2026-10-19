@@ -6,8 +6,19 @@ import { round } from "../engines/stats.js";
 import { queryOverlap, tokens } from "../engines/text.js";
 import { sha256Hex } from "../engines/security.js";
 import { canonicalStringify } from "../engines/data.js";
-import { compoundTools, evictOldest, workflowStates } from "../state/stores.js";
+import { compoundTools, evictOldest, registeredLocalTools, workflowStates } from "../state/stores.js";
 import { defineTool, fail, idStr, reqText, strArr, taskSchema, tasksSchema, txt, type LocalToolDefinition } from "./types.js";
+
+/**
+ * En un servidor ya registrado, el enrutamiento solo recomienda herramientas
+ * realmente servidas por ese perfil. Al invocar definiciones directamente
+ * (pruebas unitarias), todavía no hay registro y se usa el catálogo maestro.
+ */
+const availableCatalog = () => (
+  registeredLocalTools.size > 0
+    ? TOOLS_180.filter((entry) => registeredLocalTools.has(entry.name))
+    : TOOLS_180
+);
 
 const compound = defineTool({
   number: 1,
@@ -60,7 +71,7 @@ const router = defineTool({
   handler: (input) => {
     const statefulNumbers = new Set([1, 8, 17, 18, 54, 55, 61, 62, 119, 141, 144, 150, 154, 159, 161]);
     const goalTokens = new Set(tokens(input.goal));
-    const scored = TOOLS_180
+    const scored = availableCatalog()
       .filter((e) => (!input.familyId || e.familyId === input.familyId))
       .filter((e) => !input.excludeStateful || !statefulNumbers.has(e.number))
       .map((entry) => {
@@ -268,7 +279,7 @@ const capabilitySelector = defineTool({
   example: { capabilities: ["security"], keywords: ["secreto"] },
   handler: (input) => {
     if (!input.capabilities?.length && !input.keywords?.length && !input.familyId) fail("INVALID_INPUT");
-    const matches = TOOLS_180.filter((e) => {
+    const matches = availableCatalog().filter((e) => {
       if (input.familyId && e.familyId !== input.familyId) return false;
       if (input.capabilities?.length && !input.capabilities.includes(e.capability)) return false;
       if (input.keywords?.length) {
