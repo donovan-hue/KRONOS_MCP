@@ -10,6 +10,29 @@ Servidor Model Context Protocol que expone **184 herramientas**: 4 del núcleo (
 
 ## Instalación y ejecución
 
+### Desde npm
+
+Una vez publicada la versión, un cliente MCP puede lanzarlo por stdio sin clonar el repositorio:
+
+```json
+{
+  "mcpServers": {
+    "kronos": {
+      "command": "npx",
+      "args": ["-y", "kronos-mcp"],
+      "env": {
+        "KRONOS_API_URL": "https://api.kronos-space.com",
+        "KRONOS_MCP_TOKEN": "<credencial-de-servicio-para-las-3-herramientas-del-nucleo>"
+      }
+    }
+  }
+}
+```
+
+Sin `KRONOS_MCP_TOKEN`, las 180 herramientas locales y `kronos_contracts` siguen disponibles; las tres herramientas protegidas del núcleo responderán `AUTH_REQUIRED` o `FORBIDDEN`, según corresponda. El transporte HTTP instalado se invoca con el binario `kronos-mcp-http` y sigue exigiendo `MSP_HTTP_BEARER_TOKEN`.
+
+### Desde el código fuente
+
 ```sh
 npm ci
 # No sobrescribir un archivo privado existente.
@@ -97,6 +120,24 @@ npm run build
 La suite usa respuestas HTTP simuladas, transporte MCP en memoria y procesos reales por stdio con un fixture HTTP aislado; no requiere credenciales, MongoDB ni API de producción. No constituye prueba de autenticación, scopes o despliegue en producción.
 
 Para las 180 herramientas locales, `tests/catalog.test.ts` verifica que el catálogo generado y las definiciones coinciden (180 posiciones, 18 familias, nombres y apodos únicos) y `tests/local-tools.test.ts` llama a las 180 por MCP con su ejemplo, con `fetch` bloqueado, además de comprobar comportamiento concreto de cada familia (grafo con ciclo, webhook HMAC válido, SRT generado, contraste WCAG, cuota agotada, etc.).
+
+## Publicación en npm (mantenedores)
+
+El paquete está preparado con binarios `kronos-mcp` y `kronos-mcp-http`, lista `files`, tipos TypeScript y licencia ISC. La evidencia completa de la preparación de `0.3.0` está en [docs/EVIDENCIA_NPM_0.3.0.md](docs/EVIDENCIA_NPM_0.3.0.md). Antes de publicar, verifica el tarball tal como lo instalaría un consumidor limpio y haz el ensayo oficial de npm:
+
+```sh
+npm run verify:tarball
+npm publish --dry-run --access public
+```
+
+`verify:tarball` instala el `.tgz` en un directorio temporal, enumera las 184 herramientas, llama a las 180 locales y comprueba también el transporte HTTP. La publicación real se hace solo desde una sesión npm del propietario (nunca compartas credenciales o tokens en chats ni en Git):
+
+```sh
+npm login
+npm whoami
+npm publish --access public
+npm view kronos-mcp version
+```
 
 ## Verificación real desde Termux (opt-in)
 

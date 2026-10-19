@@ -1,8 +1,49 @@
 {
   "name": "kronos-mcp",
   "version": "0.3.0",
-  "description": "MCP server for KRONOS capabilities over stdio and Streamable HTTP",
+  "description": "KRONOS MCP server with connected KRONOS tools and 180 local deterministic tools over stdio and Streamable HTTP",
+  "license": "ISC",
+  "homepage": "https://github.com/donovan-hue/KRONOS_MCP#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donovan-hue/KRONOS_MCP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/donovan-hue/KRONOS_MCP/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "kronos",
+    "ai-tools",
+    "stdio",
+    "streamable-http"
+  ],
+  "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "kronos-mcp": "dist/index.js",
+    "kronos-mcp-http": "dist/http.js"
+  },
+  "files": [
+    "dist",
+    "docs/HERRAMIENTAS_180.md",
+    "docs/KRONOS_MCP_180_Herramientas.txt"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "npm run build && node --import tsx --test tests/*.test.ts",
     "build": "tsc",
@@ -12,12 +53,12 @@
     "dev:http": "tsx src/http.ts",
     "generate:catalog": "node scripts/generate-catalog.mjs",
     "verify:mcp": "node scripts/verify-mcp.mjs",
-    "diagnose:kronos": "node scripts/diagnose-kronos.mjs"
+    "verify:tarball": "node scripts/verify-npm-tarball.mjs",
+    "diagnose:kronos": "node scripts/diagnose-kronos.mjs",
+    "pack:check": "npm pack --dry-run",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.31.0",
     "dotenv": "^18.0.5",
