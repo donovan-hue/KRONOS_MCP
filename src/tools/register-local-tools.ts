@@ -17,7 +17,7 @@ import { catalogEntry } from "../catalog/index.js";
 import { localTool, toolAnnotations } from "../contracts/tool.js";
 import { ALL_LOCAL_TOOLS } from "../families/index.js";
 import { registeredLocalTools } from "../state/stores.js";
-import { toolRegistry } from "./registry.js";
+import { toolRegistry as globalRegistry } from "./registry.js";
 import { toolError } from "./tool-error.js";
 
 const envelopeSchema = z.object({
@@ -59,9 +59,10 @@ export function localToolsForProfile(profile: LocalToolsRegistrationProfile = "f
 
 export function registerLocalTools(
   server: McpServer,
-  options: { profile?: LocalToolsRegistrationProfile } = {},
+  options: { profile?: LocalToolsRegistrationProfile; registry?: import("../contracts/tool.js").ToolRegistry } = {},
 ): void {
   const profile = options.profile ?? "full";
+  const toolRegistry = options.registry ?? globalRegistry;
 
   // Los esquemas son dinámicos (uno por herramienta), por lo que el registro
   // se hace tras un estrecho cast de frontera. La validación real la hace el

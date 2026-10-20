@@ -170,7 +170,9 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
     return;
   }
 
-  if (!isPublicLocal && !hasValidBearerToken(req.headers.authorization, configuredToken)) {
+  const rawAuth = req.headers.authorization;
+  const normalizedAuth = Array.isArray(rawAuth) ? rawAuth[0] : rawAuth;
+  if (!isPublicLocal && !hasValidBearerToken(normalizedAuth, configuredToken)) {
     res.setHeader("www-authenticate", "Bearer");
     sendJson(res, 401, { error: "AUTH_REQUIRED" });
     return;

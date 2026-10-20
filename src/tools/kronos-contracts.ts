@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { capabilitySchema, readOnlyTool, toolAnnotations } from "../contracts/index.js";
-import { toolRegistry } from "./registry.js";
+import { toolRegistry as globalRegistry } from "./registry.js";
 import { withToolAuthorization } from "./with-tool-authorization.js";
 
 /**
@@ -40,8 +40,13 @@ const contractsOutput = z.object({
   prompts: z.array(z.string()),
 });
 
-export function registerKronosContractsTool(server: McpServer): void {
+export function registerKronosContractsTool(
+  server: McpServer,
+  registry?: import("../contracts/tool.js").ToolRegistry,
+): void {
   // Self-registration happens here, not in registry.ts, to avoid an import cycle.
+  // P0 isolation: use provided per-server registry if given, else fallback to global.
+  const toolRegistry = registry ?? globalRegistry;
   toolRegistry.register(kronosContractsContract);
 
   server.registerTool(
