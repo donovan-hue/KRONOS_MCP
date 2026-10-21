@@ -1,3 +1,11 @@
+![MCP PASS](https://img.shields.io/badge/MCP-PASS_10%2F10-brightgreen?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-108%2F108-blue?style=for-the-badge)
+![Audit](https://img.shields.io/badge/audit-0_vuln-success?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tools](https://img.shields.io/badge/tools-184_(163_public--local)-orange?style=for-the-badge)
+![Node](https://img.shields.io/badge/Node.js-22-339933?style=for-the-badge&logo=node.js&logoColor=white)
+
+
 # KRONOS MCP
 
 Servidor Model Context Protocol que expone **184 herramientas**: 4 del núcleo (conectadas al API existente de KRONOS) y 180 herramientas locales y deterministas del catálogo maestro, sin proveedores externos. No es una API social paralela ni conecta directamente con la base de datos.
