@@ -56,6 +56,7 @@ export function isLevelEnabled(level: LogLevel, minimum: LogLevel = currentLevel
 /**
  * Emits one JSON line on stderr. Returns the line that was written, which makes
  * the logger straightforward to assert on in tests.
+ * P1: soporta correlationId/requestId/durationMs/tool/version para trazabilidad §6.1
  */
 export function logEvent(
   level: LogLevel,
@@ -73,6 +74,11 @@ export function logEvent(
 
   process.stderr.write(`${line}\n`);
   return line;
+}
+
+/** Helper para contexto con correlationId/requestId — usado por http.ts y register-local-tools.ts §6.2 */
+export function withCorrelationId(correlationId: string, fields: Record<string, unknown> = {}): Record<string, unknown> {
+  return { correlationId, ...fields };
 }
 
 export const log = {

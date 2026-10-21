@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import { createKronosServer, type KronosServerProfile } from "./server.js";
 import { hasValidBearerToken } from "./http-auth.js";
 import { FixedWindowRateLimiter } from "./http-rate-limit.js";
+import { randomUUID } from "node:crypto";
+import { log } from "./observability/log.js";
 
 dotenv.config({
   path: process.env.DOTENV_CONFIG_PATH || ".env",
@@ -100,11 +102,13 @@ function rateLimitKey(req: IncomingMessage): string {
 
 const activeRequests = new Set<() => Promise<void>>();
 
-async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handleMcpRequest(req: IncomingMessage, res: ServerResponse, correlationId: string): Promise<void> {
   // The SDK's stateless Streamable HTTP transport is single-use: each HTTP
   // request needs its own transport and MCP server instance. Tool state in
   // the authenticated profile still lives in process-level stores, just as it
   // did when one server handled the process.
+  const start = performance.now();
+  log.info("mcp_request_start", { correlationId, method: req.method ?? "UNKNOWN" });
   const mcpServer = createKronosServer({ profile: serverProfile });
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
@@ -123,10 +127,15 @@ async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Prom
 
   try {
     res.setHeader("x-content-type-options", "nosniff");
+    res.setHeader("x-correlation-id", correlationId);
     await mcpServer.connect(transport);
     await transport.handleRequest(req, res);
+    const durationMs = Math.round(performance.now() - start);
+    log.info("mcp_request_complete", { correlationId, durationMs, status: res.statusCode });
   } catch {
-    if (!res.headersSent) sendJson(res, 500, { error: "INTERNAL_ERROR" });
+    const durationMs = Math.round(performance.now() - start);
+    log.warn("mcp_request_error", { correlationId, durationMs });
+    if (!res.headersSent) sendJson(res, 500, { error: "INTERNAL_ERROR", correlationId });
     else if (!res.writableEnded) res.destroy();
   } finally {
     if (res.writableEnded || res.destroyed) await cleanup();
@@ -134,11 +143,12 @@ async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Prom
 }
 
 const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+  const correlationId = (req.headers["x-correlation-id"] as string) || (req.headers["x-request-id"] as string) || randomUUID();
   let pathname: string;
   try {
     pathname = new URL(req.url || "/", "http://localhost").pathname;
   } catch {
-    sendJson(res, 400, { error: "INVALID_REQUEST" });
+    sendJson(res, 400, { error: "INVALID_REQUEST", correlationId });
     return;
   }
 
@@ -159,14 +169,15 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   }
 
   if (pathname !== "/mcp") {
-    sendJson(res, 404, { error: "NOT_FOUND" });
+    sendJson(res, 404, { error: "NOT_FOUND", correlationId });
     return;
   }
 
   const rate = rateLimiter.consume(rateLimitKey(req));
   if (!rate.allowed) {
     res.setHeader("retry-after", String(rate.retryAfterSeconds));
-    sendJson(res, 429, { error: "RATE_LIMITED" });
+    sendJson(res, 429, { error: "RATE_LIMITED", correlationId });
+    log.warn("rate_limited", { correlationId, retryAfterSeconds: rate.retryAfterSeconds });
     return;
   }
 
@@ -174,11 +185,12 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   const normalizedAuth = Array.isArray(rawAuth) ? rawAuth[0] : rawAuth;
   if (!isPublicLocal && !hasValidBearerToken(normalizedAuth, configuredToken)) {
     res.setHeader("www-authenticate", "Bearer");
-    sendJson(res, 401, { error: "AUTH_REQUIRED" });
+    sendJson(res, 401, { error: "AUTH_REQUIRED", correlationId });
+    log.warn("auth_failed", { correlationId });
     return;
   }
 
-  await handleMcpRequest(req, res);
+  await handleMcpRequest(req, res, correlationId);
 });
 
 httpServer.on("error", (error: NodeJS.ErrnoException) => {

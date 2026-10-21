@@ -1,0 +1,84 @@
+{
+  "service": "kronos-mcp",
+  "version": "0.3.0",
+  "profile": "full",
+  "generatedAt": "2026-10-21T02:06:03.823Z",
+  "global": "FAIL",
+  "summary": "Falla — corregir P1-P3 antes de producción",
+  "checks": [
+    {
+      "id": 1,
+      "name": "Contrato entrada/salida válido",
+      "status": "PASS",
+      "evidence": "180 herramientas con envelope versionado"
+    },
+    {
+      "id": 2,
+      "name": "Tipado y validaciones completos",
+      "status": "PASS",
+      "evidence": "tipado completo"
+    },
+    {
+      "id": 3,
+      "name": "Manejo errores y límites",
+      "status": "FAIL",
+      "evidence": "nextCronRuns sin límite count en src/engines/time.ts:61"
+    },
+    {
+      "id": 4,
+      "name": "Seguridad y permisos",
+      "status": "PASS",
+      "evidence": "aislamiento per-server implementado; per-tenant documentado como single-tenant (P1)"
+    },
+    {
+      "id": 5,
+      "name": "Integridad y control efectos",
+      "status": "FAIL",
+      "evidence": "15 stateful sin lock atómico, pero telemetry cap ok"
+    },
+    {
+      "id": 6,
+      "name": "Pruebas obligatorias superadas",
+      "status": "FAIL",
+      "evidence": "falta tests/concurrency.test.ts (idempotencia race)"
+    },
+    {
+      "id": 7,
+      "name": "Compatibilidad MCP",
+      "status": "PASS",
+      "evidence": "StreamableHTTPServerTransport per-request con registro aislado"
+    },
+    {
+      "id": 8,
+      "name": "Observabilidad",
+      "status": "PASS",
+      "evidence": "stderr-only con sanitizeFields, falta correlationId"
+    },
+    {
+      "id": 9,
+      "name": "Documentación y limitaciones",
+      "status": "PASS",
+      "evidence": "18 familias con limitations honestas, contrato documentado"
+    },
+    {
+      "id": 10,
+      "name": "Ausencia defectos críticos",
+      "status": "FAIL",
+      "evidence": "customPattern ReDoS sin sanitización (src/families/f08-data.ts:56)"
+    }
+  ],
+  "tools": {
+    "total": 184,
+    "catalog": 180,
+    "core": 4,
+    "blocked": 0,
+    "fail": 168
+  },
+  "remediationOrder": [
+    "P0 Aislamiento+Gate",
+    "P1 Envelope/version+Observabilidad",
+    "P2 Presupuesto/Registro",
+    "P3 Motores/Docs"
+  ],
+  "nextCommand": "npm run quality:gate -- --check version,metadata"
+}
