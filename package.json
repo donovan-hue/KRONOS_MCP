@@ -55,7 +55,8 @@
     "diagnose:kronos": "node scripts/diagnose-kronos.mjs",
     "pack:check": "npm pack --dry-run",
     "prepack": "npm run build",
-    "prepublishOnly": "node scripts/check-private-publish.mjs && npm test"
+    "prepublishOnly": "node scripts/check-private-publish.mjs && npm test",
+    "quality:gate": "node scripts/quality-gate.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.31.0",

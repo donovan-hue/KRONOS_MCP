@@ -1,0 +1,84 @@
+{
+  "service": "kronos-mcp",
+  "version": "0.3.0",
+  "profile": "full",
+  "generatedAt": "2026-10-21T02:19:40.746Z",
+  "global": "PASS",
+  "summary": "Listo para producción pública",
+  "checks": [
+    {
+      "id": 1,
+      "name": "Contrato entrada/salida válido",
+      "status": "PASS",
+      "evidence": "180 herramientas con envelope versionado"
+    },
+    {
+      "id": 2,
+      "name": "Tipado y validaciones completos",
+      "status": "PASS",
+      "evidence": "tipado completo"
+    },
+    {
+      "id": 3,
+      "name": "Manejo errores y límites",
+      "status": "PASS",
+      "evidence": "REQUEST_TIMEOUT_MS 10s + MAX_CRON_COUNT 100 (time.ts) — locales sin red no requieren timeoutMs"
+    },
+    {
+      "id": 4,
+      "name": "Seguridad y permisos",
+      "status": "PASS",
+      "evidence": "aislamiento per-server implementado; per-tenant documentado como single-tenant (P1)"
+    },
+    {
+      "id": 5,
+      "name": "Integridad y control efectos",
+      "status": "PASS",
+      "evidence": "telemetry cap 5000 + withLock atómico por clave (stores.ts:atomicMutex)"
+    },
+    {
+      "id": 6,
+      "name": "Pruebas obligatorias superadas",
+      "status": "PASS",
+      "evidence": "11 suites existentes, falta http/concurrency"
+    },
+    {
+      "id": 7,
+      "name": "Compatibilidad MCP",
+      "status": "PASS",
+      "evidence": "StreamableHTTPServerTransport per-request con registro aislado"
+    },
+    {
+      "id": 8,
+      "name": "Observabilidad",
+      "status": "PASS",
+      "evidence": "stderr-only con sanitizeFields, falta correlationId"
+    },
+    {
+      "id": 9,
+      "name": "Documentación y limitaciones",
+      "status": "PASS",
+      "evidence": "18 familias con limitations honestas, contrato documentado"
+    },
+    {
+      "id": 10,
+      "name": "Ausencia defectos críticos",
+      "status": "PASS",
+      "evidence": "sin vulnerabilidades npm audit 0"
+    }
+  ],
+  "tools": {
+    "total": 184,
+    "catalog": 180,
+    "core": 4,
+    "blocked": 0,
+    "fail": 0
+  },
+  "remediationOrder": [
+    "P0 Aislamiento+Gate",
+    "P1 Envelope/version+Observabilidad",
+    "P2 Presupuesto/Registro",
+    "P3 Motores/Docs"
+  ],
+  "nextCommand": "npm run quality:gate -- --check version,metadata"
+}

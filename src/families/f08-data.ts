@@ -9,6 +9,24 @@ import { describe, round } from "../engines/stats.js";
 import { DATE_RE, EMAIL_RE, NUMBER_RE, URL_RE, chunkText, extractPatterns, linesDiff, sentences, tokens } from "../engines/text.js";
 import { defineTool, fail, idStr, longText, recArr, strArr, txt, unknownArr, type LocalToolDefinition } from "./types.js";
 
+// §3.2 ReDoS hardening — límite y heurística de cuantificadores anidados
+const MAX_SAFE_PATTERN_LENGTH = 200;
+function assertSafePattern(pattern: string): string {
+  if (pattern.length > MAX_SAFE_PATTERN_LENGTH) fail("INVALID_INPUT");
+  if (/\+\+|\*\*|\+\*|\*\+/.test(pattern)) fail("INVALID_INPUT");
+  if (/\([^)]*[+*][^)]*\)[+*]/.test(pattern)) fail("INVALID_INPUT");
+  if (pattern.includes(".*.*")) fail("INVALID_INPUT");
+  try {
+    const t0 = Date.now();
+    new RegExp(pattern, "gu").test("a".repeat(25));
+    if (Date.now() - t0 > 25) fail("INVALID_INPUT");
+  } catch { fail("INVALID_INPUT"); }
+  return pattern;
+}
+function safeRegExp(pattern: string, flags = ""): RegExp {
+  return new RegExp(assertSafePattern(pattern), flags);
+}
+
 const extractor = defineTool({
   number: 71,
   inputSchema: z.object({
@@ -33,7 +51,7 @@ const extractor = defineTool({
     if (included.includes("hashtags")) extracted.hashtags = extractPatterns(text, /#[\p{L}\p{N}_]+/gu);
     if (input.customPattern) {
       let regex: RegExp;
-      try { regex = new RegExp(input.customPattern, "gu"); } catch { fail("INVALID_INPUT"); }
+      try { regex = safeRegExp(input.customPattern, "gu"); } catch { fail("INVALID_INPUT"); }
       extracted.custom = extractPatterns(text, regex!);
     }
     if (input.json !== undefined && input.jsonPaths?.length) {
@@ -177,7 +195,8 @@ const diffAnalyzer = defineTool({
   handler: (input) => {
     if (input.mode === "json") {
       const diffs = deepDiff(input.before, input.after);
-      return { summary: diffs.length === 0 ? "Sin diferencias." : `${diffs.length} diferencias estructurales.`, data: { changed: diffs.length > 0, differences: diffs.slice(0, 100), added: diffs.filter((d) => d.kind === "added").length, removed: diffs.filter((d) => d.kind === "removed").length, changedCount: diffs.filter((d) => d.kind === "changed" || d.kind === "type_changed").length } };
+      const warnings = diffs.length >= 100 ? ["Diferencias truncadas a 100: hay más cambios no mostrados"] : [];
+      return { summary: diffs.length === 0 ? "Sin diferencias." : `${diffs.length} diferencias estructurales.`, data: { changed: diffs.length > 0, differences: diffs.slice(0, 100), added: diffs.filter((d) => d.kind === "added").length, removed: diffs.filter((d) => d.kind === "removed").length, changedCount: diffs.filter((d) => d.kind === "changed" || d.kind === "type_changed").length }, warnings };
     }
     if (typeof input.before !== "string" || typeof input.after !== "string") fail("INVALID_INPUT");
     const { ops, approximate } = linesDiff(input.before as string, input.after as string);
@@ -232,7 +251,7 @@ const dataQuality = defineTool({
           if (rule.min !== undefined && value < rule.min) add(`Por debajo del mínimo ${rule.min}`);
           if (rule.max !== undefined && value > rule.max) add(`Por encima del máximo ${rule.max}`);
         }
-        if (rule.pattern) { try { if (!new RegExp(rule.pattern).test(String(value))) add("No cumple el patrón"); } catch { add("Patrón inválido en la regla"); } }
+        if (rule.pattern) { try { if (!safeRegExp(rule.pattern).test(String(value))) add("No cumple el patrón"); } catch { add("Patrón inválido en la regla"); } }
         if (rule.enumValues && !rule.enumValues.some((e) => canonicalStringify(e) === canonicalStringify(value))) add("Valor fuera del conjunto permitido");
         if (rule.unique) {
           const set = seen.get(rule.field) ?? new Set<string>();

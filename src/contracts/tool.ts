@@ -7,6 +7,8 @@ import { capabilitySchema, type Capability } from "./common.js";
  * A contract states what a tool is and what it needs. It is not the tool itself,
  * so registering a contract never implies the behaviour exists.
  */
+export const KRONOS_TOOL_VERSION = "0.3.0";
+
 export const toolContractSchema = z.object({
   /** Lowercase snake_case. Matches the wire name clients call. */
   name: z
@@ -16,6 +18,7 @@ export const toolContractSchema = z.object({
   capability: capabilitySchema,
   /** Permission string required to invoke the tool. Omitted means unauthenticated. */
   requiredPermission: z.string().min(1).optional(),
+  version: z.string().min(1).default(KRONOS_TOOL_VERSION),
   readOnly: z.boolean(),
   destructive: z.boolean(),
   openWorld: z.boolean(),
@@ -38,9 +41,9 @@ export function toolAnnotations(contract: ToolContract): {
 
 /** A read-only, non-destructive tool that talks to an external system. */
 export function readOnlyTool(
-  contract: Omit<ToolContract, "readOnly" | "destructive" | "openWorld">,
+  contract: Omit<ToolContract, "readOnly" | "destructive" | "openWorld" | "version"> & { version?: string },
 ): ToolContract {
-  return { ...contract, readOnly: true, destructive: false, openWorld: true };
+  return { version: KRONOS_TOOL_VERSION, ...contract, readOnly: true, destructive: false, openWorld: true };
 }
 
 /**
@@ -51,12 +54,13 @@ export function readOnlyTool(
  * not read-only while remaining non-destructive and closed-world.
  */
 export function localTool(
-  contract: Omit<ToolContract, "readOnly" | "destructive" | "openWorld"> & {
+  contract: Omit<ToolContract, "readOnly" | "destructive" | "openWorld" | "version"> & {
     stateful?: boolean;
+    version?: string;
   },
 ): ToolContract {
-  const { stateful, ...rest } = contract;
-  return { ...rest, readOnly: !stateful, destructive: false, openWorld: false };
+  const { stateful, version, ...rest } = contract;
+  return { version: version ?? KRONOS_TOOL_VERSION, ...rest, readOnly: !stateful, destructive: false, openWorld: false };
 }
 
 /**

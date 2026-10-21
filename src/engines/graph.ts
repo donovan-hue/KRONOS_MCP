@@ -20,17 +20,19 @@ export interface GraphAnalysis {
   dependents: Record<string, string[]>;
 }
 
+const MAX_GRAPH_DEPTH = 1000; // §2.8 prevenir desbordamiento de pila recursiva
 function findCycle(tasks: Map<string, GraphTask>): string[] | null {
   const state = new Map<string, "visiting" | "done">();
   const stack: string[] = [];
-  const visit = (id: string): string[] | null => {
+  const visit = (id: string, depth = 0): string[] | null => {
+    if (depth > MAX_GRAPH_DEPTH) throw new Error("GRAPH_TOO_DEEP");
     state.set(id, "visiting");
     stack.push(id);
     for (const dep of tasks.get(id)?.dependsOn ?? []) {
       if (!tasks.has(dep)) continue;
       if (state.get(dep) === "visiting") return [...stack.slice(stack.indexOf(dep)), dep];
       if (!state.has(dep)) {
-        const found = visit(dep);
+        const found = visit(dep, depth + 1);
         if (found) return found;
       }
     }

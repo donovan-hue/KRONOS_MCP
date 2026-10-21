@@ -13,16 +13,19 @@
  */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
 import { catalogEntry } from "../catalog/index.js";
 import { localTool, toolAnnotations } from "../contracts/tool.js";
 import { ALL_LOCAL_TOOLS } from "../families/index.js";
+import { KRONOS_TOOL_VERSION } from "../contracts/tool.js";
 import { registeredLocalTools } from "../state/stores.js";
-import { toolRegistry } from "./registry.js";
+import { toolRegistry as globalRegistry } from "./registry.js";
 import { toolError } from "./tool-error.js";
 
 const envelopeSchema = z.object({
   ok: z.boolean(),
   tool: z.string(),
+  version: z.string(),
   number: z.number().int(),
   nickname: z.string(),
   technicalName: z.string(),
@@ -33,6 +36,13 @@ const envelopeSchema = z.object({
   data: z.record(z.string(), z.unknown()),
   warnings: z.array(z.string()),
   limitations: z.array(z.string()),
+  error: z.object({ code: z.string(), message: z.string().optional(), retryable: z.boolean().optional(), httpStatus: z.number().optional() }).nullable(),
+  metadata: z.object({
+    correlationId: z.string(),
+    durationMs: z.number(),
+    timestamp: z.string(),
+    limitations: z.array(z.string()),
+  }),
 }).passthrough();
 
 export type LocalToolsRegistrationProfile = "full" | "public-local";
@@ -59,9 +69,10 @@ export function localToolsForProfile(profile: LocalToolsRegistrationProfile = "f
 
 export function registerLocalTools(
   server: McpServer,
-  options: { profile?: LocalToolsRegistrationProfile } = {},
+  options: { profile?: LocalToolsRegistrationProfile; registry?: import("../contracts/tool.js").ToolRegistry } = {},
 ): void {
   const profile = options.profile ?? "full";
+  const toolRegistry = options.registry ?? globalRegistry;
 
   // Los esquemas son dinámicos (uno por herramienta), por lo que el registro
   // se hace tras un estrecho cast de frontera. La validación real la hace el
@@ -106,11 +117,15 @@ export function registerLocalTools(
         },
       },
       async (args: unknown) => {
+        const start = performance.now();
+        const correlationId = randomUUID();
         try {
           const result = await definition.run(args);
+          const durationMs = Math.round(performance.now() - start);
           const envelope = {
             ok: true,
             tool: entrada.name,
+            version: KRONOS_TOOL_VERSION,
             number: entrada.number,
             nickname: entrada.nickname,
             technicalName: entrada.technicalName,
@@ -121,13 +136,24 @@ export function registerLocalTools(
             data: result.data,
             warnings: result.warnings ?? [],
             limitations: definition.limitation ? [definition.limitation] : [],
+            error: null,
+            metadata: {
+              correlationId,
+              durationMs,
+              timestamp: new Date().toISOString(),
+              limitations: definition.limitation ? [definition.limitation] : [],
+            },
           };
           return {
             structuredContent: envelope,
             content: [{ type: "text", text: JSON.stringify(envelope, null, 2) }],
           };
         } catch (error) {
-          return toolError(error);
+          const durationMs = Math.round(performance.now() - start);
+          // Wrap toolError with uniform envelope for observabilidad, pero manteniendo isError para MCP
+          const baseError = toolError(error, { correlationId, durationMs, tool: entrada.name });
+          // toolError ya loguea con correlationId; retornamos su formato estable
+          return baseError;
         }
       },
     );

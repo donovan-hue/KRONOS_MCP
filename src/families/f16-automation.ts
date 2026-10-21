@@ -55,7 +55,7 @@ const adapterBuilder = defineTool({
   inputSchema: z.object({
     serviceName: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, "kebab-case"),
     baseUrlEnvVar: z.string().min(1).max(100).regex(/^[A-Z_][A-Z0-9_]*$/).optional(),
-    auth: z.object({ type: z.enum(["bearer_env", "api_key_header_env", "none"]), envVar: z.string().max(100).regex(/^[A-Z_][A-Z0-9_]*$/).optional(), headerName: txt(100).optional() }).strict(),
+    auth: z.object({ type: z.enum(["bearer_env", "api_key_header_env", "none"]), envVar: z.string().max(100).regex(/^[A-Z_][A-Z0-9_]*$/).optional(), headerName: z.string().min(1).max(100).regex(/^[A-Za-z0-9-]+$/).optional() }).strict(),
     endpoints: z.array(z.object({ name: z.string().min(1).max(100).regex(/^[a-z][a-zA-Z0-9]*$/), method: z.enum(["GET", "POST"]), path: z.string().min(1).max(500).regex(/^\//) })).min(1).max(50),
     timeoutMs: z.number().int().min(100).max(120_000).optional(),
   }).strict(),
@@ -67,7 +67,7 @@ const adapterBuilder = defineTool({
       ? ""
       : input.auth.type === "bearer_env"
         ? `\n  const token = process.env.${input.auth.envVar ?? "SERVICE_TOKEN"}?.trim();\n  if (!token) throw new Error("AUTH_REQUIRED");\n  headers.set("Authorization", "Bearer " + token);`
-        : `\n  const key = process.env.${input.auth.envVar ?? "SERVICE_API_KEY"}?.trim();\n  if (!key) throw new Error("AUTH_REQUIRED");\n  headers.set("${input.auth.headerName ?? "X-Api-Key"}", key);`;
+        : `\n  const key = process.env.${input.auth.envVar ?? "SERVICE_API_KEY"}?.trim();\n  if (!key) throw new Error("AUTH_REQUIRED");\n  headers.set(${JSON.stringify(input.auth.headerName ?? "X-Api-Key")}, key);`;
     const methods = input.endpoints.map((e) => e.method === "GET"
       ? `/** GET ${e.path} */\nexport function get_${e.name}(baseUrl) {\n  return requestJson(baseUrl, "GET", "${e.path}");\n}`
       : `/** POST ${e.path} */\nexport function post_${e.name}(baseUrl, body) {\n  return requestJson(baseUrl, "POST", "${e.path}", body);\n}`).join("\n\n");
