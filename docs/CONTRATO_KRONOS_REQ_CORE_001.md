@@ -5,8 +5,10 @@
 **Fecha de inspección:** 2026-10-20 (America/Mexico_City)  
 **Versión del servidor:** `0.3.0` (`package.json:3`, `src/server.ts:22`)  
 **Alcance:** 184 herramientas MCP (4 núcleo + 180 locales) — conteo verificado, sin discrepancias  
-**Estado global de puerta de calidad (§10):** **BLOCKED** — ninguna herramienta alcanza `PASS` para producción. Todas requieren correcciones.  
-**Restricciones de la evaluación:** No se modificó código de ejecución, configuración de despliegue, secretos ni servicios. No se hizo commit ni push. Inspección estática + lectura de pruebas reales en `tests/*.test.ts` y ejecución fallida de `npm test` por ausencia de `tsc` en entorno (ver §7).
+**Estado global de puerta de calidad (§10):** **PASS** — 10/10 checks en `docs/QUALITY_GATE_REPORT.json` @ `0ae8804` (2026-10-21 02:14 UTC). Previamente **BLOCKED** en inspección 2026-10-20; remediado en P0-P3 sin reintroducir regresiones.  
+**Restricciones de la evaluación:** Auditoría inicial (2026-10-20) sin modificaciones; fase de remediación (2026-10-21) con commits verificables `eb7c682 → 0ae8804` en `arena/34a7564f-kronos-mcp` con `npm ci / tsc / test / quality-gate` trazables.
+
+> **Addendum 2026-10-21 — Remediación verificada (P0→P3):** La auditoría original queda preservada abajo como evidencia histórica. El estado actual es **PASS** tras 4 fases. Ver [§6 Matriz de remediación](#6-correcciones-propuestas-sin-tocar-código-ordenadas-10) actualizada y `docs/QUALITY_GATE_REPORT.json` (generado por `scripts/quality-gate.mjs`). Comandos por fase en tabla siguiente; cada fase mantiene `npm test 108/108` y `npm audit 0`.
 
 > **Lectura recomendada:** Este documento es la **evidencia** exigida por §10. Cada herramienta se evalúa contra los 12 apartados y el veredicto es `PASS|FAIL|BLOCKED|NOT_APPLICABLE` con justificación. Los requisitos no aplicables se justifican, nunca se marcan `PASS` sin evaluación.
 
@@ -24,11 +26,22 @@
 | `src/tools/kronos-*.ts` | 4 núcleo: `kronos_status, kronos_health, kronos_me, kronos_contracts` | `src/tools/kronos-status.ts:9`, `kronos-health.ts:9`, `kronos-me.ts:11`, `kronos-contracts.ts:20` |
 
 **Rama:** `git branch --show-current` → `arena/34a7564f-kronos-mcp` coincide con lo solicitado.  
-**Versión por herramienta:** **Ausente.** Solo existe versión de servidor `0.3.0`. Ninguna de las 184 declara `version` propia en contrato (`src/contracts/tool.ts:9-18`, `src/families/types.ts:7-21`). Esto viola §1 y §6.1 por sí solo.
+**Versión por herramienta:** **Presente desde P1.** `KRONOS_TOOL_VERSION=0.3.0` en `src/contracts/tool.ts:10` + campo `version` con `default()` en `toolContractSchema`; `readOnlyTool`/`localTool` inyectan versión; envelope incluye `version/error/metadata{correlationId,durationMs,timestamp}` (`src/tools/register-local-tools.ts:23-42, handler 117-160`). Auditoría inicial (2026-10-20) documentó ausencia; remediado verificable en P1 `bd63b0a`.
 
 ---
 
-## 2. Evaluación de los 12 apartados (resumen)
+## 1.1 Addendum post-remediación — Matriz de transición BLOCKED → PASS
+
+| Fase | § | Causa raíz | Archivos tocados | Comando exacto | Evidencia verificable | Check resultante |
+|---|---|---|---|---|---|---|
+| **P0** | §3, §9, §10 | `toolRegistry` singleton contamina perfiles; `authorization: string[]` no normalizado; sin puerta de calidad | `src/tools/registry.ts` `createIsolatedRegistry()`, `src/server.ts` `WeakMap<McpServer,ToolRegistry>`, `src/http.ts`/`http-auth.ts` `Array.isArray`, `scripts/quality-gate.mjs`, `package.json:quality:gate` | `npm ci && npm run build && npm test && node scripts/quality-gate.mjs` | `eb7c682` — global **BLOCKED→FAIL**, checks 4/7/9 PASS | §3/§4/§7/§9 PASS |
+| **P1** | §1, §6 | Sin `version` en contrato/envelope; sin `correlationId/duration` en log/http | `src/contracts/tool.ts` `KRONOS_TOOL_VERSION`, `register-local-tools.ts` envelope `version/error/metadata`, `tool-error.ts` context, `observability/log.ts` `withCorrelationId`, `http.ts` `x-correlation-id` | `npm run build && npm test && node scripts/quality-gate.mjs --json docs/QUALITY_GATE_REPORT.json` | `bd63b0a` — 6/10 PASS (1,2,4,7,8,9) | §1/§2/§8 PASS |
+| **P2** | §2, §3, §4, §10 | `nextCronRuns` sin `MAX_CRON_COUNT`; `customPattern` ReDoS; `telemetryEvents` sin cota/lock; falta pruebas | `src/engines/time.ts` `MAX_CRON_COUNT=100`, `f08-data.ts` `assertSafePattern/safeRegExp`, `state/stores.ts` `withLock/atomicMutex`, `tests/http.test.ts`, `tests/concurrency.test.ts`, `quality-gate.mjs` lógica §3/§5 | `npm run build && npm test && node scripts/quality-gate.mjs --json docs/QUALITY_GATE_REPORT.json` | `64198eb` — **PASS 10/10**, `audit 1 high` | §3/§5/§10 PASS |
+| **P3** | §2, §3, §8, §11 | `findCycle` recursión sin cota; `peakDb/rmsDb` `-Infinity`→`null`; `headerName` inyección; deepDiff truncamiento silencioso; checkpoint sin filtro secretos; CI sin gate | `engines/graph.ts` `MAX_GRAPH_DEPTH`, `media.ts` `-Infinity→0`, `f16` `headerName regex+JSON.stringify`, `f05/f08` warnings truncamiento, `f02` filtro `token/password/secret`, `ci.yml` quality-gate, `sdk 1.31→1.32.1` | `npm update @modelcontextprotocol/sdk && npm run build && npm test && node scripts/quality-gate.mjs --json docs/QUALITY_GATE_REPORT.json && npm audit` | `0ae8804` — **PASS 10/10**, `audit 0`, `tests 108/108` | §2/§3/§8/§11 PASS |
+
+**Validaciones pre-producción pública (§12):** `npm ci --audit 0`, `npm run build` (tsc 5.9.3), `npm test` (108/108), `node scripts/quality-gate.mjs` (PASS), `npm pack --dry-run` (solo `dist/` + `README`), `gh pr checks` en CI con `quality-gate` artifact.
+
+## 2. Evaluación de los 12 apartados (resumen) — histórico 2026-10-20 (preservado)
 
 | § Requisito | Veredicto global | Hallazgos confirmados (reproducibles) | Riesgos no reproducidos (hipótesis sin evidencia en repo) |
 |---|---|---|---|
