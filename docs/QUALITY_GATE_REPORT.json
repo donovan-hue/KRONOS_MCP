@@ -2,7 +2,7 @@
   "service": "kronos-mcp",
   "version": "0.3.0",
   "profile": "full",
-  "generatedAt": "2026-10-21T02:12:36.209Z",
+  "generatedAt": "2026-10-21T02:19:40.746Z",
   "global": "PASS",
   "summary": "Listo para producción pública",
   "checks": [

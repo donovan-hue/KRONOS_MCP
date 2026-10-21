@@ -34,3 +34,11 @@ jobs:
         run: npm ci
       - name: Build and test
         run: npm test
+      - name: Quality gate §10 (BLOCKED/FAIL/PASS)
+        run: node scripts/quality-gate.mjs --json docs/QUALITY_GATE_REPORT.json
+      - name: Upload quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-gate-report
+          path: docs/QUALITY_GATE_REPORT.json

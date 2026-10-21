@@ -90,14 +90,16 @@ export function linearToDb(value: number): number {
 }
 
 export function peakDb(samples: readonly number[]): number {
-  if (samples.length === 0) return -Infinity;
-  return round(linearToDb(Math.max(...samples.map(Math.abs))), 2);
+  if (samples.length === 0) return 0;
+  const db = linearToDb(Math.max(...samples.map(Math.abs)));
+  return Number.isFinite(db) ? round(db, 2) : 0;
 }
 
 export function rmsDb(samples: readonly number[]): number {
-  if (samples.length === 0) return -Infinity;
+  if (samples.length === 0) return 0;
   const rms = Math.sqrt(samples.reduce((acc, s) => acc + s * s, 0) / samples.length);
-  return round(linearToDb(rms), 2);
+  const db = linearToDb(rms);
+  return Number.isFinite(db) ? round(db, 2) : 0;
 }
 
 export function dbToLinear(db: number): number {

@@ -255,6 +255,8 @@ const rollback = defineTool({
     if (!input.checkpointId) fail("INVALID_INPUT");
     if (input.action === "create") {
       if (input.state === undefined) fail("INVALID_INPUT");
+      const stateStr = canonicalStringify(input.state).toLowerCase();
+      if (/token|password|secret|credential|apikey/.test(stateStr)) fail("INVALID_INPUT");
       const hash = sha256Hex(canonicalStringify(input.state));
       checkpoints.set(input.checkpointId!, { label: input.label ?? "", state: input.state, createdAt: new Date().toISOString(), hash });
       evictOldest(checkpoints);

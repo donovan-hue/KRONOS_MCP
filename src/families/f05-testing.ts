@@ -99,7 +99,8 @@ const accuracyEvaluator = defineTool({
       const exact = diffs.length === 0;
       const countLeaves = (v: unknown): number => (typeof v === "object" && v !== null ? Math.max(1, Object.values(v as Record<string, unknown>).reduce<number>((a, c) => a + countLeaves(c), 0)) : 1);
       const total = Math.max(1, countLeaves(input.reference));
-      return { summary: exact ? "Salida idéntica a la referencia." : `${diffs.length} diferencias frente a la referencia.`, data: { exact, similarityApproxPct: round(Math.max(0, (1 - diffs.length / total)) * 100, 1), differences: diffs.slice(0, 50) } };
+      const warnings = diffs.length >= 100 ? ["Diferencias truncadas a 100"] : [];
+      return { summary: exact ? "Salida idéntica a la referencia." : `${diffs.length} diferencias frente a la referencia.`, data: { exact, similarityApproxPct: round(Math.max(0, (1 - diffs.length / total)) * 100, 1), differences: diffs.slice(0, 50) }, warnings };
     }
     const ref = String(input.reference ?? "");
     const cand = String(input.candidate ?? "");
@@ -180,9 +181,11 @@ const expectedComparator = defineTool({
     if (input.caseSensitive === false) {
       diffs = diffs.filter((d) => canonicalStringify(norm(d.expected)) !== canonicalStringify(norm(d.actual)));
     }
+    const warnings = diffs.length >= 100 ? ["Diferencias truncadas a 100"] : [];
     return {
       summary: diffs.length === 0 ? "El resultado coincide con lo esperado." : `${diffs.length} diferencias frente a lo esperado.`,
       data: { matches: diffs.length === 0, differences: diffs.slice(0, 100), differenceCount: diffs.length },
+      warnings,
     };
   },
 });

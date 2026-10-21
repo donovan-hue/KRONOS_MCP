@@ -195,7 +195,8 @@ const diffAnalyzer = defineTool({
   handler: (input) => {
     if (input.mode === "json") {
       const diffs = deepDiff(input.before, input.after);
-      return { summary: diffs.length === 0 ? "Sin diferencias." : `${diffs.length} diferencias estructurales.`, data: { changed: diffs.length > 0, differences: diffs.slice(0, 100), added: diffs.filter((d) => d.kind === "added").length, removed: diffs.filter((d) => d.kind === "removed").length, changedCount: diffs.filter((d) => d.kind === "changed" || d.kind === "type_changed").length } };
+      const warnings = diffs.length >= 100 ? ["Diferencias truncadas a 100: hay más cambios no mostrados"] : [];
+      return { summary: diffs.length === 0 ? "Sin diferencias." : `${diffs.length} diferencias estructurales.`, data: { changed: diffs.length > 0, differences: diffs.slice(0, 100), added: diffs.filter((d) => d.kind === "added").length, removed: diffs.filter((d) => d.kind === "removed").length, changedCount: diffs.filter((d) => d.kind === "changed" || d.kind === "type_changed").length }, warnings };
     }
     if (typeof input.before !== "string" || typeof input.after !== "string") fail("INVALID_INPUT");
     const { ops, approximate } = linesDiff(input.before as string, input.after as string);
