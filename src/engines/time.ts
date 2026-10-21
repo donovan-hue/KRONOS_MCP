@@ -57,8 +57,12 @@ function matchesCron(schedule: CronSchedule, date: Date): boolean {
   return dom && dow;
 }
 
+/** Límite §2 — evitar ampliación de carga por cron masivo */
+export const MAX_CRON_COUNT = 100;
+
 /** Próximas ejecuciones en UTC. Búsqueda minuto a minuto con tope de ~2 años. */
 export function nextCronRuns(expression: string, from: Date, count: number): Date[] {
+  if (!Number.isInteger(count) || count < 1 || count > MAX_CRON_COUNT) throw new KronosApiError("INVALID_INPUT");
   const schedule = parseCron(expression);
   const runs: Date[] = [];
   const cursor = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate(), from.getUTCHours(), from.getUTCMinutes(), 0, 0));

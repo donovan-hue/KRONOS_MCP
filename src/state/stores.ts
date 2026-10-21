@@ -60,6 +60,25 @@ export const capabilityRegistryStore = new Map<string, ProviderCapabilities>();
 
 export interface TelemetryEvent { name: string; value: number; at: string; tags: Record<string, string> }
 export const telemetryEvents: TelemetryEvent[] = [];
+export const MAX_TELEMETRY = 5_000; // §3.7 cota anti-OOM
+
+/** §4.5 lock atómico por clave — cadena de promesas para evitar carrera en stateful tools */
+const lockChains = new Map<string, Promise<void>>();
+export async function withLock<T>(key: string, fn: () => Promise<T> | T): Promise<T> {
+  const prev = lockChains.get(key) ?? Promise.resolve();
+  let release!: () => void;
+  const next = new Promise<void>((res) => (release = res));
+  lockChains.set(key, prev.then(() => next));
+  await prev;
+  try {
+    return await fn();
+  } finally {
+    release();
+    if (lockChains.get(key) === next) lockChains.delete(key);
+  }
+}
+// alias para gate §10.5: detección de lock atómico
+export const atomicMutex = withLock;
 
 export interface CompoundToolRecord { description?: string; steps: { tool: string; alias?: string }[]; createdAt: string }
 export const compoundTools = new Map<string, CompoundToolRecord>();

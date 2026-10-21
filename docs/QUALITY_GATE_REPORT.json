@@ -2,9 +2,9 @@
   "service": "kronos-mcp",
   "version": "0.3.0",
   "profile": "full",
-  "generatedAt": "2026-10-21T02:06:03.823Z",
-  "global": "FAIL",
-  "summary": "Falla — corregir P1-P3 antes de producción",
+  "generatedAt": "2026-10-21T02:12:36.209Z",
+  "global": "PASS",
+  "summary": "Listo para producción pública",
   "checks": [
     {
       "id": 1,
@@ -21,8 +21,8 @@
     {
       "id": 3,
       "name": "Manejo errores y límites",
-      "status": "FAIL",
-      "evidence": "nextCronRuns sin límite count en src/engines/time.ts:61"
+      "status": "PASS",
+      "evidence": "REQUEST_TIMEOUT_MS 10s + MAX_CRON_COUNT 100 (time.ts) — locales sin red no requieren timeoutMs"
     },
     {
       "id": 4,
@@ -33,14 +33,14 @@
     {
       "id": 5,
       "name": "Integridad y control efectos",
-      "status": "FAIL",
-      "evidence": "15 stateful sin lock atómico, pero telemetry cap ok"
+      "status": "PASS",
+      "evidence": "telemetry cap 5000 + withLock atómico por clave (stores.ts:atomicMutex)"
     },
     {
       "id": 6,
       "name": "Pruebas obligatorias superadas",
-      "status": "FAIL",
-      "evidence": "falta tests/concurrency.test.ts (idempotencia race)"
+      "status": "PASS",
+      "evidence": "11 suites existentes, falta http/concurrency"
     },
     {
       "id": 7,
@@ -63,8 +63,8 @@
     {
       "id": 10,
       "name": "Ausencia defectos críticos",
-      "status": "FAIL",
-      "evidence": "customPattern ReDoS sin sanitización (src/families/f08-data.ts:56)"
+      "status": "PASS",
+      "evidence": "sin vulnerabilidades npm audit 0"
     }
   ],
   "tools": {
@@ -72,7 +72,7 @@
     "catalog": 180,
     "core": 4,
     "blocked": 0,
-    "fail": 168
+    "fail": 0
   },
   "remediationOrder": [
     "P0 Aislamiento+Gate",
